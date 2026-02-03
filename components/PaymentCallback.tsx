@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
+import { usePurchaseHistory } from '../context/PurchaseHistoryContext';
 import { APPS_SCRIPT_URL } from '../config';
 
 interface PaymentCallbackProps {
@@ -20,6 +21,7 @@ interface PurchasedItem {
 
 const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess }) => {
   const { cart, clearCart } = useCart();
+  const { addPurchase } = usePurchaseHistory();
   const [status, setStatus] = useState<'loading' | 'success' | 'pending' | 'error'>('loading');
   const [viewMode, setViewMode] = useState<'summary' | 'details'>('summary');
   const [paymentData, setPaymentData] = useState<any>(null);
@@ -154,6 +156,24 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
 
             console.log('✅ Items comprados:', items);
             setPurchasedItems(items);
+
+            // Guardar en historial de compras (sessionStorage)
+            addPurchase({
+              paymentId: paymentId!,
+              items: items.map(item => ({
+                id: item.id,
+                name: item.name,
+                description: item.description,
+                price: item.price,
+                link: item.link,
+                imageUrl: item.imageUrl,
+                category: item.category
+              })),
+              total: total,
+              currency: curr,
+              customerEmail: customer.email,
+              customerName: customer.name
+            });
 
             // Limpiar URL sin recargar
             window.history.replaceState({}, '', window.location.pathname);

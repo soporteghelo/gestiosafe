@@ -1,12 +1,14 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { CartProvider, useCart } from './context/CartContext';
+import { PurchaseHistoryProvider, usePurchaseHistory } from './context/PurchaseHistoryContext';
 import { Template } from './types';
 import { TEMPLATES as FALLBACK_TEMPLATES } from './constants';
 import TemplateCard from './components/TemplateCard';
 import CheckoutModal from './components/CheckoutModal';
 import PaymentCallback from './components/PaymentCallback';
-import { APPS_SCRIPT_URL, WHATSAPP_NUMBER } from './config';
+import PurchaseHistoryModal from './components/PurchaseHistoryModal';
+import { APPS_SCRIPT_URL, WHATSAPP_NUMBER, DISCOUNT_PERCENT, PROMO_NAME, PROMO_MESSAGE } from './config';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -92,6 +94,7 @@ const AppContent: React.FC = () => {
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -215,6 +218,22 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+      {/* Banner de Descuento */}
+      {DISCOUNT_PERCENT > 0 && (
+        <div className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 text-white py-2.5 px-4 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIiBjeD0iMjAiIGN5PSIyMCIgcj0iMyIvPjwvZz48L3N2Zz4=')] opacity-30"></div>
+          <div className="relative flex items-center justify-center gap-3 flex-wrap">
+            <span className="text-2xl animate-bounce">🔥</span>
+            <span className="font-black text-sm md:text-base uppercase tracking-wider">{PROMO_NAME}</span>
+            <span className="bg-white text-red-600 px-3 py-1 rounded-full text-xs md:text-sm font-black animate-pulse">
+              -{DISCOUNT_PERCENT}% OFF
+            </span>
+            <span className="text-xs md:text-sm font-medium hidden sm:inline">{PROMO_MESSAGE}</span>
+            <span className="text-2xl animate-bounce">🔥</span>
+          </div>
+        </div>
+      )}
+
       {toast && (
         <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] animate-bounce">
           <div className="bg-slate-900 text-white px-6 py-3 rounded-full text-xs font-bold shadow-2xl border border-white/10 flex items-center gap-3">
@@ -238,6 +257,15 @@ const AppContent: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 lg:gap-4">
+          {/* Botón Historial de Compras */}
+          <button 
+            onClick={() => setIsHistoryOpen(true)} 
+            className="relative p-2.5 text-slate-300 hover:bg-white/5 rounded-xl transition-all"
+            title="Mis Compras"
+          >
+            <span className="material-symbols-outlined text-2xl">receipt_long</span>
+          </button>
+          {/* Botón Carrito */}
           <button onClick={() => itemCount > 0 && setIsCheckoutOpen(true)} className="relative p-2.5 text-slate-300 hover:bg-white/5 rounded-xl transition-all">
             <span className="material-symbols-outlined text-2xl">shopping_cart</span>
             {itemCount > 0 && <span className="absolute top-1 right-1 size-5 bg-pragmo-cyan text-background-dark text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-background-dark">{itemCount}</span>}
@@ -383,6 +411,9 @@ const AppContent: React.FC = () => {
       <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
       <TemplateDetailsDrawer template={selectedTemplate} onClose={() => setSelectedTemplate(null)} onAddToCart={addToCart} />
       
+      {/* Modal de Historial de Compras */}
+      <PurchaseHistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
+      
       {/* Modal de retorno de Mercado Pago */}
       {showPaymentCallback && (
         <PaymentCallback 
@@ -394,5 +425,11 @@ const AppContent: React.FC = () => {
   );
 };
 
-const App = () => (<CartProvider><AppContent /></CartProvider>);
+const App = () => (
+  <CartProvider>
+    <PurchaseHistoryProvider>
+      <AppContent />
+    </PurchaseHistoryProvider>
+  </CartProvider>
+);
 export default App;

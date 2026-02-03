@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
-import { APPS_SCRIPT_URL, MERCADOPAGO_PUBLIC_KEY, EXCHANGE_RATE } from '../config';
+import { APPS_SCRIPT_URL, MERCADOPAGO_PUBLIC_KEY, EXCHANGE_RATE, DISCOUNT_PERCENT, PROMO_NAME, PROMO_MESSAGE } from '../config';
 
 declare global {
   interface Window {
@@ -68,8 +68,19 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     return total;
   };
 
+  // Calcular descuento
+  const getDiscountAmount = () => {
+    if (DISCOUNT_PERCENT <= 0) return 0;
+    return getTotalInCurrency() * (DISCOUNT_PERCENT / 100);
+  };
+
+  // Total con descuento aplicado
+  const getFinalTotal = () => {
+    return getTotalInCurrency() - getDiscountAmount();
+  };
+
   const getAmountForPayment = () => {
-    return Number(getTotalInCurrency().toFixed(2));
+    return Number(getFinalTotal().toFixed(2));
   };
 
   const getCurrencySymbol = () => selectedCurrency === 'PEN' ? 'S/' : '$';
@@ -377,7 +388,15 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
 
             <div className="bg-slate-50 p-4 rounded-2xl w-full">
               <p className="text-xs font-bold text-slate-400 uppercase mb-2">Total a pagar</p>
-              <p className="text-3xl font-black text-slate-900">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</p>
+              {DISCOUNT_PERCENT > 0 ? (
+                <div className="space-y-1">
+                  <p className="text-lg text-slate-400 line-through">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</p>
+                  <p className="text-3xl font-black text-green-600">{getCurrencySymbol()} {getFinalTotal().toFixed(2)}</p>
+                  <p className="text-xs font-bold text-green-500">¡Ahorraste {getCurrencySymbol()} {getDiscountAmount().toFixed(2)}!</p>
+                </div>
+              ) : (
+                <p className="text-3xl font-black text-slate-900">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</p>
+              )}
             </div>
 
             {/* Campo para número de operación */}
@@ -501,7 +520,14 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
               </div>
 
               <button onClick={handleContinue} disabled={loadingToken || !formData.email || !formData.firstName} className="w-full py-6 bg-pragmo-blue hover:bg-blue-800 text-white font-black rounded-3xl shadow-xl shadow-blue-500/20 disabled:opacity-50 transition-all active:scale-95 flex items-center justify-center gap-3 text-lg mt-8">
-                {loadingToken ? (<div className="size-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>) : (<>Continuar al Pago ({getCurrencySymbol()} {getTotalInCurrency().toFixed(2)})</>)}
+                {loadingToken ? (
+                  <div className="size-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    Continuar al Pago ({getCurrencySymbol()} {getFinalTotal().toFixed(2)})
+                    {DISCOUNT_PERCENT > 0 && <span className="ml-2 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full">-{DISCOUNT_PERCENT}%</span>}
+                  </>
+                )}
               </button>
             </div>
           )}
@@ -697,10 +723,32 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
             })}
           </div>
           <div className="mt-6 pt-6 border-t border-slate-200">
+            {/* Banner de descuento */}
+            {DISCOUNT_PERCENT > 0 && (
+              <div className="mb-6 p-4 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl text-white relative overflow-hidden">
+                <div className="absolute -right-4 -top-4 text-8xl opacity-20">🔥</div>
+                <div className="relative">
+                  <p className="font-black text-lg">{PROMO_NAME}</p>
+                  <p className="text-sm opacity-90">{PROMO_MESSAGE}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="bg-white text-red-600 px-3 py-1 rounded-full text-sm font-black">-{DISCOUNT_PERCENT}% OFF</span>
+                    <span className="text-sm">Ahorras {getCurrencySymbol()} {getDiscountAmount().toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-between items-end mb-6">
               <div>
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Total Final</span>
-                <span className="text-5xl font-black text-slate-900 tracking-tighter">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</span>
+                {DISCOUNT_PERCENT > 0 ? (
+                  <div>
+                    <span className="text-2xl text-slate-400 line-through mr-2">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</span>
+                    <span className="text-4xl font-black text-green-600 tracking-tighter">{getCurrencySymbol()} {getFinalTotal().toFixed(2)}</span>
+                  </div>
+                ) : (
+                  <span className="text-5xl font-black text-slate-900 tracking-tighter">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</span>
+                )}
                 {selectedCurrency === 'PEN' && <p className="text-[10px] text-slate-400 mt-1">T.C. Referencial S/ {EXCHANGE_RATE.toFixed(2)}</p>}
               </div>
               <div className="text-right"><p className="text-[10px] font-bold text-slate-400 uppercase">Artículos: {cart.length}</p></div>
