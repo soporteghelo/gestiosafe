@@ -116,6 +116,7 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
           const data = await res.json();
 
           console.log('📥 Respuesta verificación:', data);
+          console.log('🔗 Download links recibidos:', data.download_links);
 
           if (data.status === 'approved') {
             setPaymentData(data);
@@ -376,9 +377,9 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
                             Descargar Archivo
                           </a>
                         ) : (
-                          <div className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-amber-50 border-2 border-amber-200 text-amber-700 font-medium rounded-xl">
-                            <span className="material-symbols-outlined text-lg">mail</span>
-                            El link será enviado a tu correo
+                          <div className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-slate-100 border-2 border-slate-200 text-slate-500 font-medium rounded-xl">
+                            <span className="material-symbols-outlined text-lg">sync</span>
+                            Procesando link de descarga...
                           </div>
                         )}
                       </div>
@@ -390,14 +391,6 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
                     <p>No se encontraron productos</p>
                   </div>
                 )}
-              </div>
-
-              {/* Nota */}
-              <div className="bg-blue-50 p-4 rounded-2xl">
-                <p className="text-xs text-blue-600 text-center">
-                  <span className="material-symbols-outlined text-sm align-middle mr-1">mail</span>
-                  También recibirás los enlaces de descarga en <strong>{customerData.email}</strong>
-                </p>
               </div>
             </div>
           )}
