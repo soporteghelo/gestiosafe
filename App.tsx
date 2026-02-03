@@ -111,6 +111,7 @@ const AppContent: React.FC = () => {
 
   const [activeSector, setActiveSector] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeFormat, setActiveFormat] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popular');
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
@@ -212,6 +213,10 @@ const AppContent: React.FC = () => {
 
   const sectors = useMemo(() => Array.from(new Set(templates.map(t => t.sector).filter(Boolean))).sort(), [templates]);
   const categories = useMemo(() => Array.from(new Set(templates.map(t => t.category).filter(Boolean))).sort(), [templates]);
+  const formats = useMemo(() => {
+    const allFormats = templates.flatMap(t => t.fileType || []).filter(Boolean);
+    return Array.from(new Set(allFormats.map(f => f.trim().toUpperCase()))).sort();
+  }, [templates]);
 
   const filteredTemplates = useMemo(() => {
     let result = templates.filter(t => {
@@ -219,13 +224,14 @@ const AppContent: React.FC = () => {
         t.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesSector = activeSector ? t.sector === activeSector : true;
       const matchesCategory = activeCategory ? t.category === activeCategory : true;
-      return matchesSearch && matchesSector && matchesCategory;
+      const matchesFormat = activeFormat ? (t.fileType || []).some(f => f.trim().toUpperCase() === activeFormat) : true;
+      return matchesSearch && matchesSector && matchesCategory && matchesFormat;
     });
     if (sortBy === 'popular') result.sort((a, b) => (b.isPopular ? 1 : 0) - (a.isPopular ? 1 : 0));
     if (sortBy === 'price-low') result.sort((a, b) => a.price - b.price);
     if (sortBy === 'price-high') result.sort((a, b) => b.price - a.price);
     return result;
-  }, [templates, searchQuery, activeSector, activeCategory, sortBy]);
+  }, [templates, searchQuery, activeSector, activeCategory, activeFormat, sortBy]);
 
   const displayedTemplates = filteredTemplates.slice(0, visibleCount);
 
@@ -298,41 +304,98 @@ const AppContent: React.FC = () => {
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay - Filtros */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-[99] bg-background-dark/98 backdrop-blur-lg pt-20">
-          <div className="p-6 space-y-6">
+        <div className="lg:hidden fixed inset-0 z-[99] bg-slate-900 pt-16 overflow-y-auto">
+          {/* Header del menú */}
+          <div className="sticky top-0 bg-slate-900 border-b border-slate-700 px-4 py-3 flex items-center justify-between">
+            <h3 className="text-white font-bold text-lg">Filtros</h3>
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)} 
+              className="size-10 bg-slate-800 rounded-full flex items-center justify-center text-white"
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          
+          <div className="p-4 space-y-5 pb-24">
+            {/* Acciones rápidas */}
             <div className="space-y-2">
-              <button onClick={() => { scrollTo('catalog'); setIsMobileMenuOpen(false); }} className="w-full text-left px-4 py-4 text-white font-bold rounded-xl bg-white/5 flex items-center gap-3">
-                <span className="material-symbols-outlined">grid_view</span>
+              <button onClick={() => { scrollTo('catalog'); setIsMobileMenuOpen(false); }} className="w-full text-left px-4 py-3.5 text-white font-bold rounded-xl bg-slate-800 flex items-center gap-3 active:bg-slate-700">
+                <span className="material-symbols-outlined text-pragmo-cyan">grid_view</span>
                 Ver Plantillas
               </button>
-              <button onClick={() => { handleContactWhatsApp(); setIsMobileMenuOpen(false); }} className="w-full text-left px-4 py-4 text-white font-bold rounded-xl bg-white/5 flex items-center gap-3">
-                <span className="material-symbols-outlined">chat</span>
+              <button onClick={() => { handleContactWhatsApp(); setIsMobileMenuOpen(false); }} className="w-full text-left px-4 py-3.5 text-white font-bold rounded-xl bg-slate-800 flex items-center gap-3 active:bg-slate-700">
+                <span className="material-symbols-outlined text-green-400">chat</span>
                 Contactar por WhatsApp
               </button>
             </div>
             
-            {/* Filtros Móviles */}
-            <div className="bg-white/5 rounded-2xl p-4">
-              <p className="text-xs font-bold text-slate-400 uppercase mb-3">Filtrar por Sector</p>
+            {/* Filtro por Sector */}
+            <div className="bg-slate-800 rounded-2xl p-4">
+              <p className="text-xs font-bold text-pragmo-cyan uppercase mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-sm">business</span>
+                Sector
+              </p>
               <div className="flex flex-wrap gap-2">
-                <button onClick={() => { setActiveSector(null); setIsMobileMenuOpen(false); }} className={`px-3 py-2 rounded-lg text-xs font-bold ${!activeSector ? 'bg-pragmo-cyan text-background-dark' : 'bg-white/10 text-white'}`}>Todos</button>
+                <button onClick={() => setActiveSector(null)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${!activeSector ? 'bg-pragmo-cyan text-slate-900' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>Todos</button>
                 {sectors.map(s => (
-                  <button key={s} onClick={() => { setActiveSector(s); setIsMobileMenuOpen(false); }} className={`px-3 py-2 rounded-lg text-xs font-bold ${activeSector === s ? 'bg-pragmo-cyan text-background-dark' : 'bg-white/10 text-white'}`}>{s}</button>
+                  <button key={s} onClick={() => setActiveSector(s)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${activeSector === s ? 'bg-pragmo-cyan text-slate-900' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>{s}</button>
                 ))}
               </div>
             </div>
             
-            <div className="bg-white/5 rounded-2xl p-4">
-              <p className="text-xs font-bold text-slate-400 uppercase mb-3">Filtrar por Categoría</p>
+            {/* Filtro por Categoría */}
+            <div className="bg-slate-800 rounded-2xl p-4">
+              <p className="text-xs font-bold text-pragmo-green uppercase mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-sm">category</span>
+                Categoría
+              </p>
               <div className="flex flex-wrap gap-2">
-                <button onClick={() => { setActiveCategory(null); setIsMobileMenuOpen(false); }} className={`px-3 py-2 rounded-lg text-xs font-bold ${!activeCategory ? 'bg-pragmo-green text-white' : 'bg-white/10 text-white'}`}>Todas</button>
+                <button onClick={() => setActiveCategory(null)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${!activeCategory ? 'bg-pragmo-green text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>Todas</button>
                 {categories.map(c => (
-                  <button key={c} onClick={() => { setActiveCategory(c); setIsMobileMenuOpen(false); }} className={`px-3 py-2 rounded-lg text-xs font-bold ${activeCategory === c ? 'bg-pragmo-green text-white' : 'bg-white/10 text-white'}`}>{c}</button>
+                  <button key={c} onClick={() => setActiveCategory(c)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${activeCategory === c ? 'bg-pragmo-green text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>{c}</button>
                 ))}
               </div>
             </div>
+            
+            {/* Filtro por Formato */}
+            <div className="bg-slate-800 rounded-2xl p-4">
+              <p className="text-xs font-bold text-orange-400 uppercase mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-sm">description</span>
+                Tipo de Archivo
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button onClick={() => setActiveFormat(null)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${!activeFormat ? 'bg-orange-500 text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>Todos</button>
+                {formats.map(f => (
+                  <button key={f} onClick={() => setActiveFormat(f)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${activeFormat === f ? 'bg-orange-500 text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>{f}</button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Botón aplicar filtros */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="w-full py-4 bg-pragmo-blue text-white font-black rounded-xl active:bg-blue-700 flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined">check</span>
+              Aplicar Filtros
+              {(activeSector || activeCategory || activeFormat) && (
+                <span className="bg-white text-pragmo-blue text-xs px-2 py-0.5 rounded-full">
+                  {(activeSector ? 1 : 0) + (activeCategory ? 1 : 0) + (activeFormat ? 1 : 0)}
+                </span>
+              )}
+            </button>
+            
+            {/* Limpiar filtros */}
+            {(activeSector || activeCategory || activeFormat) && (
+              <button 
+                onClick={() => { setActiveSector(null); setActiveCategory(null); setActiveFormat(null); }}
+                className="w-full py-3 bg-slate-800 text-slate-400 font-bold rounded-xl active:bg-slate-700"
+              >
+                Limpiar todos los filtros
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -402,20 +465,20 @@ const AppContent: React.FC = () => {
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
               className={`px-3.5 py-2.5 rounded-xl flex items-center justify-center transition-all shadow-sm ${
-                activeSector || activeCategory 
+                activeSector || activeCategory || activeFormat
                   ? 'bg-pragmo-blue text-white' 
                   : 'bg-white border border-slate-200 text-slate-600'
               }`}
             >
               <span className="material-symbols-outlined text-lg">tune</span>
-              {(activeSector || activeCategory) && (
+              {(activeSector || activeCategory || activeFormat) && (
                 <span className="ml-1 size-5 bg-white text-pragmo-blue text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {(activeSector ? 1 : 0) + (activeCategory ? 1 : 0)}
+                  {(activeSector ? 1 : 0) + (activeCategory ? 1 : 0) + (activeFormat ? 1 : 0)}
                 </span>
               )}
             </button>
           </div>
-          {(activeSector || activeCategory) && (
+          {(activeSector || activeCategory || activeFormat) && (
             <div className="flex flex-wrap gap-1.5 items-center">
               <span className="text-[10px] text-slate-400 font-medium">Filtros:</span>
               {activeSector && (
@@ -436,8 +499,17 @@ const AppContent: React.FC = () => {
                   <span className="material-symbols-outlined text-sm">close</span>
                 </button>
               )}
+              {activeFormat && (
+                <button 
+                  onClick={() => setActiveFormat(null)} 
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-orange-500 text-white text-[10px] font-bold rounded-full active:scale-95"
+                >
+                  {activeFormat}
+                  <span className="material-symbols-outlined text-sm">close</span>
+                </button>
+              )}
               <button 
-                onClick={() => { setActiveSector(null); setActiveCategory(null); }}
+                onClick={() => { setActiveSector(null); setActiveCategory(null); setActiveFormat(null); }}
                 className="text-[10px] text-slate-500 underline ml-1"
               >
                 Limpiar
@@ -502,6 +574,33 @@ const AppContent: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              <div>
+                <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-5">Tipo de Archivo</h4>
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => setActiveFormat(null)}
+                    className={`text-left px-4 py-3 rounded-xl text-xs font-bold transition-all ${!activeFormat ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}
+                  >
+                    Todos los Formatos
+                  </button>
+                  {formats.map(f => (
+                    <button
+                      key={f}
+                      onClick={() => setActiveFormat(f)}
+                      className={`text-left px-4 py-3 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${activeFormat === f ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}
+                    >
+                      <span className="material-symbols-outlined text-sm">
+                        {f.includes('EXCEL') || f.includes('XLS') ? 'table_chart' : 
+                         f.includes('WORD') || f.includes('DOC') ? 'article' : 
+                         f.includes('PDF') ? 'picture_as_pdf' : 
+                         f.includes('PPT') || f.includes('POWER') ? 'slideshow' : 'description'}
+                      </span>
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </aside>
@@ -539,7 +638,37 @@ const AppContent: React.FC = () => {
         </main>
       </section>
 
-      <footer className="bg-background-dark text-white py-12 border-t border-white/5">
+      {/* Botones Flotantes Móviles */}
+      <div className="lg:hidden fixed bottom-6 right-4 z-[90] flex flex-col gap-3">
+        {/* Botón Historial - solo si hay compras previas */}
+        <button 
+          onClick={() => setIsHistoryOpen(true)}
+          className="size-12 bg-slate-700 hover:bg-slate-600 active:bg-slate-800 text-white rounded-full shadow-lg shadow-slate-900/30 flex items-center justify-center transition-all active:scale-90"
+          title="Historial de Compras"
+        >
+          <span className="material-symbols-outlined text-xl">receipt_long</span>
+        </button>
+        
+        {/* Botón Carrito */}
+        <button 
+          onClick={() => itemCount > 0 && setIsCheckoutOpen(true)}
+          className={`size-14 rounded-full shadow-xl flex items-center justify-center transition-all active:scale-90 relative ${
+            itemCount > 0 
+              ? 'bg-pragmo-cyan text-slate-900 shadow-cyan-500/40' 
+              : 'bg-slate-200 text-slate-400'
+          }`}
+          disabled={itemCount === 0}
+        >
+          <span className="material-symbols-outlined text-2xl">shopping_cart</span>
+          {itemCount > 0 && (
+            <span className="absolute -top-1 -right-1 size-6 bg-red-500 text-white text-xs font-black rounded-full flex items-center justify-center border-2 border-white shadow-lg animate-pulse">
+              {itemCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      <footer className="bg-background-dark text-white py-12 lg:py-12 pb-28 lg:pb-12 border-t border-white/5">
         <div className="max-w-[1440px] mx-auto px-8 lg:px-20 text-center">
           <p className="text-slate-600 text-[10px] font-black uppercase tracking-[0.2em]">
             © 2024 Gestiosafe Inc. • Soluciones Digitales SST
