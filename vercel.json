@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.gestiosafe.com"
+        }
+      ],
+      "destination": "https://gestiosafe.com/:path*",
+      "permanent": true
+    }
+  ]
+}

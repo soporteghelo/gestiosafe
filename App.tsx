@@ -8,14 +8,6 @@ import CheckoutModal from './components/CheckoutModal';
 import PaymentCallback from './components/PaymentCallback';
 import { APPS_SCRIPT_URL, WHATSAPP_NUMBER } from './config';
 
-// Redirigir www a non-www para consistencia (importante para localStorage)
-if (typeof window !== 'undefined') {
-  const host = window.location.hostname;
-  if (host === 'www.gestiosafe.com') {
-    window.location.href = window.location.href.replace('www.gestiosafe.com', 'gestiosafe.com');
-  }
-}
-
 const ITEMS_PER_PAGE = 12;
 
 const sanitizeString = (str: any) => {
