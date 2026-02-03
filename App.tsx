@@ -6,8 +6,7 @@ import { TEMPLATES as FALLBACK_TEMPLATES } from './constants';
 import TemplateCard from './components/TemplateCard';
 import CheckoutModal from './components/CheckoutModal';
 import PaymentCallback from './components/PaymentCallback';
-
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_nTlClIdCX8IXq-XY14q5MGeWNjww5TQIr3NlB2HUIGm9VehHEUSSs3yYSW0VZdc1Rg/exec"
+import { APPS_SCRIPT_URL, WHATSAPP_NUMBER } from './config';
 const ITEMS_PER_PAGE = 12;
 
 const sanitizeString = (str: any) => {

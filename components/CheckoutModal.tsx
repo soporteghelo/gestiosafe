@@ -1,12 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
-
-// URL ACTUALIZADA POR EL USUARIO
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRt4zbQ0Eustfhv5dkVbS4hG4mGebASpuEXuDD2NgOp1txUM616nTQ_X7qVXcTpkLTZA/exec";
-// ⚠️ IMPORTANTE: Obtén tu clave en https://www.mercadopago.com.pe/developers/panel
-// Ve a Credenciales → Prueba (para sandbox) o Producción
-// Configúrala en .env.local como: VITE_MERCADOPAGO_PUBLIC_KEY=APP_USR-...
-const MERCADOPAGO_PUBLIC_KEY = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || "APP_USR-NOT_CONFIGURED";
+import { APPS_SCRIPT_URL, MERCADOPAGO_PUBLIC_KEY, EXCHANGE_RATE } from '../config';
 
 declare global {
   interface Window {
@@ -34,7 +28,7 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   });
 
   const [selectedCurrency, setSelectedCurrency] = useState<'PEN' | 'USD'>('PEN');
-  const EXCHANGE_RATE = 3.80;
+  // EXCHANGE_RATE importado desde config.ts
 
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);

@@ -1,4 +1,10 @@
 
+// ============================================
+// GESTIOSAFE - GOOGLE APPS SCRIPT
+// CON LOGS DETALLADOS PARA DEBUGGING
+// Versión: 2.0 - Febrero 2026
+// ============================================
+
 const SPREADSHEET_ID = "1Evdfwrmp--kt6P-a6Zuobs9MRR2J7leJviO7k9u2vdA";
 const MP_ACCESS_TOKEN = "TEST-7737746752799435-020210-2c5bcc69ed889fe5591a8fb92b47868a-3176203752";
 
@@ -6,33 +12,140 @@ function doGet(e) {
   const p = e.parameter;
   const action = p.action;
 
-  Logger.log("=== MERCADO PAGO REQUEST ===");
+  Logger.log("========== NUEVA PETICIÓN ==========");
+  Logger.log("Fecha: " + new Date().toISOString());
   Logger.log("Action: " + action);
-  Logger.log("Parameters: " + JSON.stringify(p));
+  Logger.log("Parámetros: " + JSON.stringify(p));
 
-  switch (action) {
-    case "GET_CATALOG":
-      return handleGetCatalog();
-    case "CREATE_MP_PREFERENCE":
-      return handleCreateMPPreference(p);
-    case "PROCESS_CARD_PAYMENT":
-      return handleProcessCardPaymentGET(p);
-    case "VERIFY_PAYMENT":
-      return handleVerifyPayment(p);
-    case "VERIFY_BY_PAYMENT_ID":
-      return handleVerifyByPaymentId(p);
-    default:
-      return createJsonResponse({
-        status: "ERROR",
-        message: "Acción no especificada o inválida: " + action
-      });
+  try {
+    switch (action) {
+      case "GET_CATALOG":
+        return handleGetCatalog();
+      
+      case "CREATE_MP_PREFERENCE":
+        return handleCreateMPPreference(p);
+      
+      case "VERIFY_PAYMENT":
+        return handleVerifyPayment(p);
+      
+      case "VERIFY_BY_PAYMENT_ID":
+        return handleVerifyByPaymentId(p);
+      
+      case "TEST_REGISTRO":
+        return testRegistroVenta(p);
+      
+      case "PROCESS_CARD_PAYMENT":
+        return handleProcessCardPaymentGET(p);
+      
+      default:
+        Logger.log("❌ Acción no reconocida: " + action);
+        return jsonResponse({
+          status: "ERROR",
+          message: "Acción no especificada o inválida: " + action,
+          availableActions: ["GET_CATALOG", "CREATE_MP_PREFERENCE", "VERIFY_PAYMENT", "VERIFY_BY_PAYMENT_ID", "TEST_REGISTRO"]
+        });
+    }
+  } catch (error) {
+    Logger.log("❌ ERROR GENERAL: " + error.toString());
+    Logger.log("Stack: " + error.stack);
+    return jsonResponse({
+      status: "ERROR",
+      message: error.toString()
+    });
   }
 }
 
+function jsonResponse(data) {
+  Logger.log("📤 Respuesta: " + JSON.stringify(data));
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ==========================================
+// TEST: Simular registro de venta exitoso
+// Llama con: ?action=TEST_REGISTRO&email=test@test.com
+// ==========================================
+function testRegistroVenta(p) {
+  Logger.log("=== 🧪 TEST REGISTRO VENTA ===");
+  
+  try {
+    Logger.log("1️⃣ Abriendo Spreadsheet...");
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    Logger.log("✅ Spreadsheet abierto: " + ss.getName());
+    
+    // Buscar o crear hoja Ventas
+    Logger.log("2️⃣ Buscando hoja 'Ventas'...");
+    let sheet = ss.getSheetByName("Ventas");
+    
+    if (!sheet) {
+      Logger.log("📝 Hoja 'Ventas' no existe, creándola...");
+      sheet = ss.insertSheet("Ventas");
+      sheet.appendRow([
+        "Fecha",
+        "Payment ID",
+        "Preference ID",
+        "Cliente",
+        "Email",
+        "Items",
+        "Total",
+        "Moneda",
+        "Estado"
+      ]);
+      Logger.log("✅ Hoja 'Ventas' creada con encabezados");
+    } else {
+      Logger.log("✅ Hoja 'Ventas' encontrada");
+    }
+    
+    // Registrar venta de prueba
+    Logger.log("3️⃣ Insertando fila de prueba...");
+    const testData = [
+      new Date(),
+      "TEST-" + Date.now(),
+      "PREF-TEST-" + Date.now(),
+      p.customer_name || "Cliente Test",
+      p.email || "test@test.com",
+      p.items || "Producto de Prueba",
+      p.total || "100.00",
+      p.currency || "PEN",
+      "✅ APROBADO (TEST)"
+    ];
+    
+    sheet.appendRow(testData);
+    Logger.log("✅ Fila de prueba agregada exitosamente");
+    Logger.log("Datos: " + JSON.stringify(testData));
+    
+    return jsonResponse({
+      status: "SUCCESS",
+      message: "✅ Registro de prueba creado exitosamente. Revisa la hoja 'Ventas' en tu Spreadsheet.",
+      data: testData,
+      spreadsheetUrl: ss.getUrl()
+    });
+    
+  } catch (error) {
+    Logger.log("❌ Error en test: " + error.toString());
+    Logger.log("Stack: " + error.stack);
+    return jsonResponse({
+      status: "ERROR",
+      message: error.toString(),
+      hint: "Verifica que el SPREADSHEET_ID sea correcto y tengas permisos de edición"
+    });
+  }
+}
+
+// ==========================================
+// CATÁLOGO
+// ==========================================
 function handleGetCatalog() {
+  Logger.log("=== 📚 GET_CATALOG ===");
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     const sheet = ss.getSheetByName("Plantillas");
+    
+    if (!sheet) {
+      Logger.log("❌ No se encontró la hoja 'Plantillas'");
+      return jsonResponse([]);
+    }
+    
     const data = sheet.getDataRange().getValues();
     const headers = data[0];
     const rows = data.slice(1);
@@ -40,41 +153,342 @@ function handleGetCatalog() {
     const result = rows.map(row => {
       let obj = {};
       headers.forEach((header, i) => {
-        let key = header.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+        let key = header.toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, '');
         obj[key] = row[i];
       });
       return obj;
     });
     
-    Logger.log("Catálogo devuelto: " + result.length + " items");
-    return createJsonResponse(result);
+    Logger.log("✅ Catálogo: " + result.length + " items");
+    return jsonResponse(result);
   } catch (e) {
-    Logger.log("Error en handleGetCatalog: " + e.toString());
-    return createJsonResponse([]);
+    Logger.log("❌ Error catálogo: " + e.toString());
+    return jsonResponse([]);
   }
 }
 
-function createJsonResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+// ==========================================
+// CREAR PREFERENCIA MP
+// ==========================================
+function handleCreateMPPreference(p) {
+  Logger.log("=== 💳 CREATE_MP_PREFERENCE ===");
+  Logger.log("Total: " + p.total);
+  Logger.log("Email: " + p.email);
+  Logger.log("Cliente: " + p.customer_name);
+  Logger.log("Título: " + p.title);
+  Logger.log("Back URL: " + p.back_url);
+
+  if (!p.total || isNaN(parseFloat(p.total))) {
+    Logger.log("❌ Monto inválido");
+    return jsonResponse({ status: "ERROR", message: "Monto total inválido" });
+  }
+
+  const backUrl = p.back_url || "https://gestiosafe.com";
+  const transactionId = "GS-" + Date.now();
+  
+  const payload = {
+    items: [{
+      title: p.title || "Producto Gestiosafe",
+      quantity: 1,
+      currency_id: p.currency_id || "PEN",
+      unit_price: parseFloat(p.total)
+    }],
+    payer: {
+      email: p.email || "test@test.com",
+      name: p.customer_name || "Cliente"
+    },
+    back_urls: {
+      success: backUrl,
+      failure: backUrl,
+      pending: backUrl
+    },
+    auto_return: "approved",
+    external_reference: transactionId
+  };
+
+  Logger.log("📦 Payload MP: " + JSON.stringify(payload));
+
+  const options = {
+    method: "post",
+    contentType: "application/json",
+    headers: { "Authorization": "Bearer " + MP_ACCESS_TOKEN },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  try {
+    Logger.log("📡 Enviando a Mercado Pago...");
+    const response = UrlFetchApp.fetch("https://api.mercadopago.com/checkout/preferences", options);
+    const code = response.getResponseCode();
+    const text = response.getContentText();
+    
+    Logger.log("📨 HTTP " + code);
+    Logger.log("📨 Response: " + text);
+    
+    const data = JSON.parse(text);
+
+    if (data.id) {
+      Logger.log("✅ Preferencia creada: " + data.id);
+      Logger.log("✅ Init point: " + data.init_point);
+      
+      // Registrar como PENDIENTE
+      registrarVentaPendiente(data.id, p);
+      
+      return jsonResponse({
+        status: "SUCCESS",
+        preferenceId: data.id,
+        init_point: data.init_point,
+        transactionId: transactionId
+      });
+    } else {
+      Logger.log("❌ Error MP: " + JSON.stringify(data));
+      return jsonResponse({ 
+        status: "ERROR", 
+        message: data.message || "Error creando preferencia",
+        details: data
+      });
+    }
+  } catch (e) {
+    Logger.log("❌ Excepción: " + e.toString());
+    return jsonResponse({ status: "ERROR", message: e.toString() });
+  }
 }
 
 // ==========================================
-// PROCESAR PAGO CON TARJETA (via GET - para evitar CORS)
+// REGISTRAR VENTA PENDIENTE
+// ==========================================
+function registrarVentaPendiente(preferenceId, p) {
+  Logger.log("=== 📝 REGISTRAR VENTA PENDIENTE ===");
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    let sheet = ss.getSheetByName("Ventas");
+    
+    if (!sheet) {
+      Logger.log("Creando hoja Ventas...");
+      sheet = ss.insertSheet("Ventas");
+      sheet.appendRow(["Fecha", "Payment ID", "Preference ID", "Cliente", "Email", "Items", "Total", "Moneda", "Estado"]);
+    }
+    
+    const row = [
+      new Date(),
+      "PENDIENTE",
+      preferenceId,
+      p.customer_name || "Cliente",
+      p.email || "N/A",
+      p.title || "Productos",
+      p.total,
+      p.currency_id || "PEN",
+      "🟡 PENDIENTE"
+    ];
+    
+    sheet.appendRow(row);
+    Logger.log("✅ Venta pendiente registrada: " + JSON.stringify(row));
+  } catch (e) {
+    Logger.log("⚠️ Error registrando pendiente: " + e.toString());
+  }
+}
+
+// ==========================================
+// VERIFICAR POR PAYMENT ID (Número de operación)
+// ==========================================
+function handleVerifyByPaymentId(p) {
+  Logger.log("=== 🔍 VERIFY_BY_PAYMENT_ID ===");
+  Logger.log("Payment ID: " + p.payment_id);
+  Logger.log("Email: " + p.email);
+  Logger.log("Cliente: " + p.customer_name);
+
+  if (!p.payment_id) {
+    Logger.log("❌ Falta payment_id");
+    return jsonResponse({ status: "ERROR", message: "Se requiere payment_id" });
+  }
+
+  try {
+    const url = "https://api.mercadopago.com/v1/payments/" + p.payment_id;
+    Logger.log("📡 Consultando: " + url);
+    
+    const options = {
+      method: "get",
+      headers: { "Authorization": "Bearer " + MP_ACCESS_TOKEN },
+      muteHttpExceptions: true
+    };
+
+    const response = UrlFetchApp.fetch(url, options);
+    const code = response.getResponseCode();
+    const text = response.getContentText();
+    
+    Logger.log("📨 HTTP " + code);
+    Logger.log("📨 Response: " + text.substring(0, 500) + "...");
+
+    if (code === 200) {
+      const payment = JSON.parse(text);
+      Logger.log("💰 Estado del pago: " + payment.status);
+      Logger.log("💰 Monto: " + payment.transaction_amount + " " + payment.currency_id);
+
+      if (payment.status === "approved") {
+        Logger.log("✅ ¡PAGO APROBADO!");
+        
+        // Actualizar registro a APROBADO
+        actualizarVentaAprobada(payment.id, payment, p);
+        
+        return jsonResponse({
+          status: "approved",
+          payment_id: payment.id,
+          amount: payment.transaction_amount,
+          currency: payment.currency_id,
+          payer_email: payment.payer?.email,
+          message: "¡Pago verificado exitosamente!"
+        });
+      } else {
+        Logger.log("⏳ Pago no aprobado: " + payment.status);
+        return jsonResponse({
+          status: payment.status,
+          payment_id: payment.id,
+          message: "Estado del pago: " + payment.status + " - " + (payment.status_detail || "")
+        });
+      }
+    } else if (code === 404) {
+      Logger.log("❌ Pago no encontrado");
+      return jsonResponse({ status: "not_found", message: "Pago no encontrado con ese número de operación" });
+    } else {
+      Logger.log("❌ Error HTTP " + code);
+      return jsonResponse({ status: "error", message: "Error HTTP " + code });
+    }
+  } catch (e) {
+    Logger.log("❌ Error: " + e.toString());
+    return jsonResponse({ status: "error", message: e.toString() });
+  }
+}
+
+// ==========================================
+// VERIFICAR POR PREFERENCE ID
+// ==========================================
+function handleVerifyPayment(p) {
+  Logger.log("=== 🔍 VERIFY_PAYMENT ===");
+  Logger.log("Preference ID: " + p.preference_id);
+
+  if (!p.preference_id) {
+    return jsonResponse({ status: "ERROR", message: "Se requiere preference_id" });
+  }
+
+  try {
+    // Buscar por external_reference que es el transactionId
+    const url = "https://api.mercadopago.com/v1/payments/search?external_reference=" + p.preference_id + "&sort=date_created&criteria=desc";
+    Logger.log("📡 Buscando: " + url);
+    
+    const options = {
+      method: "get",
+      headers: { "Authorization": "Bearer " + MP_ACCESS_TOKEN },
+      muteHttpExceptions: true
+    };
+
+    const response = UrlFetchApp.fetch(url, options);
+    const data = JSON.parse(response.getContentText());
+    
+    Logger.log("📨 Resultados: " + data.results?.length || 0);
+
+    if (data.results && data.results.length > 0) {
+      const payment = data.results.find(p => p.status === "approved") || data.results[0];
+      Logger.log("💰 Pago encontrado: " + payment.id + " - " + payment.status);
+      
+      if (payment.status === "approved") {
+        actualizarVentaAprobada(payment.id, payment, p);
+        return jsonResponse({
+          status: "approved",
+          payment_id: payment.id,
+          amount: payment.transaction_amount,
+          message: "¡Pago verificado!"
+        });
+      } else {
+        return jsonResponse({ status: payment.status, message: "Estado: " + payment.status });
+      }
+    } else {
+      Logger.log("❌ Sin resultados");
+      return jsonResponse({ status: "not_found", message: "No hay pagos para esta preferencia" });
+    }
+  } catch (e) {
+    Logger.log("❌ Error: " + e.toString());
+    return jsonResponse({ status: "error", message: e.toString() });
+  }
+}
+
+// ==========================================
+// ACTUALIZAR VENTA A APROBADA
+// ==========================================
+function actualizarVentaAprobada(paymentId, payment, p) {
+  Logger.log("=== ✅ ACTUALIZAR VENTA APROBADA ===");
+  Logger.log("Payment ID: " + paymentId);
+  
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    let sheet = ss.getSheetByName("Ventas");
+    
+    if (!sheet) {
+      Logger.log("Creando hoja Ventas...");
+      sheet = ss.insertSheet("Ventas");
+      sheet.appendRow(["Fecha", "Payment ID", "Preference ID", "Cliente", "Email", "Items", "Total", "Moneda", "Estado"]);
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    let found = false;
+    
+    // Buscar si ya existe este payment
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][1]) === String(paymentId)) {
+        Logger.log("ℹ️ Payment ya registrado en fila " + (i+1));
+        found = true;
+        break;
+      }
+      
+      // Buscar pendiente y actualizar
+      if (data[i][1] === "PENDIENTE" && data[i][8] === "🟡 PENDIENTE") {
+        Logger.log("📝 Actualizando fila " + (i+1) + " de PENDIENTE a APROBADO");
+        sheet.getRange(i + 1, 2).setValue(paymentId); // Payment ID
+        sheet.getRange(i + 1, 9).setValue("✅ APROBADO"); // Estado
+        found = true;
+        Logger.log("✅ Fila actualizada");
+        break;
+      }
+    }
+    
+    if (!found) {
+      Logger.log("📝 Creando nueva fila de venta aprobada...");
+      const newRow = [
+        new Date(),
+        paymentId,
+        payment.preference_id || "N/A",
+        p.customer_name || "Cliente",
+        payment.payer?.email || p.email || "N/A",
+        p.items || "Productos",
+        payment.transaction_amount,
+        payment.currency_id || "PEN",
+        "✅ APROBADO"
+      ];
+      sheet.appendRow(newRow);
+      Logger.log("✅ Nueva fila creada: " + JSON.stringify(newRow));
+    }
+  } catch (e) {
+    Logger.log("⚠️ Error actualizando venta: " + e.toString());
+  }
+}
+
+// ==========================================
+// PROCESAR PAGO CON TARJETA (GET)
 // ==========================================
 function handleProcessCardPaymentGET(p) {
-  Logger.log("=== PROCESS_CARD_PAYMENT (GET) ===");
-  Logger.log("Parámetros recibidos: " + JSON.stringify(p));
+  Logger.log("=== 💳 PROCESS_CARD_PAYMENT ===");
+  Logger.log("Parámetros: " + JSON.stringify(p));
   
   const url = "https://api.mercadopago.com/v1/payments";
   
-  // Construir el payload para el pago
   const payload = {
     transaction_amount: parseFloat(p.transaction_amount),
     token: p.token,
     description: p.description || "Compra Gestiosafe",
     installments: parseInt(p.installments) || 1,
     payment_method_id: p.payment_method_id,
-    issuer_id: p.issuer_id || null,
     payer: {
       email: p.payer_email || "test@test.com",
       identification: {
@@ -84,12 +498,11 @@ function handleProcessCardPaymentGET(p) {
     }
   };
   
-  // Remover issuer_id si está vacío
-  if (!payload.issuer_id) {
-    delete payload.issuer_id;
+  if (p.issuer_id) {
+    payload.issuer_id = p.issuer_id;
   }
   
-  Logger.log("Payload de pago: " + JSON.stringify(payload));
+  Logger.log("📦 Payload: " + JSON.stringify(payload));
   
   const options = {
     method: "post",
@@ -103,666 +516,87 @@ function handleProcessCardPaymentGET(p) {
   };
   
   try {
-    Logger.log("📡 Enviando pago a Mercado Pago...");
+    Logger.log("📡 Enviando pago...");
     const response = UrlFetchApp.fetch(url, options);
-    const responseText = response.getContentText();
-    const responseCode = response.getResponseCode();
+    const code = response.getResponseCode();
+    const text = response.getContentText();
     
-    Logger.log("📨 Respuesta HTTP (" + responseCode + "): " + responseText);
+    Logger.log("📨 HTTP " + code + ": " + text);
     
-    const result = JSON.parse(responseText);
+    const result = JSON.parse(text);
     
-    if (responseCode === 200 || responseCode === 201) {
+    if (code === 200 || code === 201) {
       Logger.log("✅ Pago procesado: " + result.status);
-      Logger.log("Status detail: " + result.status_detail);
       
-      // Si el pago fue aprobado, registrar la venta
       if (result.status === 'approved') {
-        try {
-          const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-          const sheet = ss.getSheetByName("Ventas");
-          if (sheet) {
-            sheet.appendRow([
-              new Date(),
-              p.payer_email || "N/A",
-              result.id,
-              result.status,
-              p.transaction_amount,
-              p.currency_id || "PEN",
-              result.payment_method_id,
-              "Card Payment Brick"
-            ]);
-            Logger.log("✅ Venta registrada en hoja");
-          }
-        } catch (sheetError) {
-          Logger.log("⚠️ Error registrando venta: " + sheetError.toString());
-        }
+        actualizarVentaAprobada(result.id, result, p);
       }
       
-      return createJsonResponse({
+      return jsonResponse({
         status: result.status,
         id: result.id,
         status_detail: result.status_detail,
-        payment_method_id: result.payment_method_id,
         message: getStatusMessage(result.status, result.status_detail)
       });
     } else {
-      Logger.log("❌ Error en pago - HTTP " + responseCode);
-      return createJsonResponse({
+      Logger.log("❌ Error en pago");
+      return jsonResponse({
         status: "error",
         message: result.message || "Error procesando pago",
-        cause: result.cause,
-        status_detail: result.status_detail,
         details: result
       });
     }
-    
   } catch (e) {
-    Logger.log("💥 Excepción: " + e.toString());
-    Logger.log("Stack: " + e.stack);
-    return createJsonResponse({
-      status: "error",
-      message: e.toString()
-    });
+    Logger.log("❌ Excepción: " + e.toString());
+    return jsonResponse({ status: "error", message: e.toString() });
   }
 }
 
-// Función auxiliar para mensajes de estado
+// ==========================================
+// Mensajes de estado
+// ==========================================
 function getStatusMessage(status, statusDetail) {
   const messages = {
     'approved': '¡Pago aprobado exitosamente!',
     'pending': 'El pago está pendiente de confirmación.',
     'in_process': 'El pago está siendo procesado.',
     'rejected': 'El pago fue rechazado.',
-    'cc_rejected_other_reason': 'Tarjeta rechazada. En modo sandbox, usa tarjetas de prueba.',
-    'cc_rejected_call_for_authorize': 'Debes autorizar el pago ante tu banco.',
+    'cc_rejected_other_reason': 'Tarjeta rechazada. En sandbox usa tarjetas de prueba.',
+    'cc_rejected_call_for_authorize': 'Debes autorizar el pago con tu banco.',
     'cc_rejected_insufficient_amount': 'Saldo insuficiente.',
-    'cc_rejected_bad_filled_card_number': 'Número de tarjeta incorrecto.',
-    'cc_rejected_bad_filled_security_code': 'Código de seguridad incorrecto.',
-    'cc_rejected_bad_filled_date': 'Fecha de vencimiento incorrecta.',
   };
   return messages[statusDetail] || messages[status] || 'Estado: ' + status;
 }
 
 // ==========================================
-// VERIFICAR PAGO POR PREFERENCE ID
+// DO POST (para webhooks)
 // ==========================================
-function handleVerifyPayment(p) {
-  Logger.log("=== VERIFY_PAYMENT ===");
-  Logger.log("Preference ID: " + p.preference_id);
-  Logger.log("Items: " + p.items);
-  Logger.log("Email: " + p.email);
-  Logger.log("Customer: " + p.customer_name);
-  
-  if (!p.preference_id) {
-    return createJsonResponse({
-      status: "ERROR",
-      message: "Se requiere preference_id"
-    });
-  }
-  
-  try {
-    // Buscar pagos asociados a esta preferencia
-    const url2 = "https://api.mercadopago.com/v1/payments/search?preference_id=" + p.preference_id + "&sort=date_created&criteria=desc";
-    
-    const options = {
-      method: "get",
-      headers: {
-        "Authorization": "Bearer " + MP_ACCESS_TOKEN
-      },
-      muteHttpExceptions: true
-    };
-    
-    Logger.log("📡 Buscando pagos para preference: " + p.preference_id);
-    
-    const response = UrlFetchApp.fetch(url2, options);
-    const responseText = response.getContentText();
-    const responseCode = response.getResponseCode();
-    
-    Logger.log("📨 Respuesta (" + responseCode + "): " + responseText);
-    
-    const result = JSON.parse(responseText);
-    
-    if (responseCode === 200 && result.results && result.results.length > 0) {
-      // Buscar el pago más reciente aprobado
-      const approvedPayment = result.results.find(payment => payment.status === 'approved');
-      
-      if (approvedPayment) {
-        Logger.log("✅ Pago aprobado encontrado: " + approvedPayment.id);
-        
-        // Actualizar el registro pendiente a APROBADO
-        try {
-          const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-          let sheet = ss.getSheetByName("Ventas");
-          
-          if (sheet) {
-            const data = sheet.getDataRange().getValues();
-            
-            // Buscar si ya existe este payment_id
-            let paymentExists = false;
-            for (let i = 1; i < data.length; i++) {
-              if (String(data[i][2]) === String(approvedPayment.id)) {
-                paymentExists = true;
-                break;
-              }
-            }
-            
-            if (!paymentExists) {
-              // Buscar la fila con este preference_id y actualizarla
-              let updated = false;
-              for (let i = 1; i < data.length; i++) {
-                if (String(data[i][1]) === String(p.preference_id) && data[i][8] === "🟡 PENDIENTE") {
-                  // Actualizar esta fila
-                  sheet.getRange(i + 1, 3).setValue(approvedPayment.id); // Payment ID
-                  sheet.getRange(i + 1, 9).setValue("✅ APROBADO"); // Estado
-                  updated = true;
-                  Logger.log("✅ Fila " + (i + 1) + " actualizada a APROBADO");
-                  break;
-                }
-              }
-              
-              // Si no encontró, crear nueva fila
-              if (!updated) {
-                let items = [];
-                try {
-                  if (p.items) {
-                    items = JSON.parse(decodeURIComponent(p.items));
-                  }
-                } catch (parseError) {
-                  items = [{ name: "Producto", price: approvedPayment.transaction_amount }];
-                }
-                
-                const itemNames = items.map(function(item) { return item.name; }).join(", ");
-                
-                sheet.appendRow([
-                  new Date(),
-                  p.preference_id || "N/A",
-                  approvedPayment.id,
-                  p.customer_name || "Cliente",
-                  approvedPayment.payer?.email || p.email || "N/A",
-                  itemNames || "Productos Gestiosafe",
-                  approvedPayment.transaction_amount,
-                  approvedPayment.currency_id || "PEN",
-                  "✅ APROBADO"
-                ]);
-                Logger.log("✅ Nueva fila creada con pago APROBADO");
-              }
-            } else {
-              Logger.log("ℹ️ Pago ya estaba registrado");
-            }
-          }
-        } catch (sheetError) {
-          Logger.log("⚠️ Error actualizando venta: " + sheetError.toString());
-        }
-        
-        return createJsonResponse({
-          status: "approved",
-          payment_id: approvedPayment.id,
-          amount: approvedPayment.transaction_amount,
-          currency: approvedPayment.currency_id,
-          payer_email: approvedPayment.payer?.email,
-          date: approvedPayment.date_approved,
-          message: "¡Pago verificado exitosamente!"
-        });
-      } else {
-        // Hay pagos pero ninguno aprobado
-        const latestPayment = result.results[0];
-        Logger.log("⏳ Pago encontrado pero no aprobado: " + latestPayment.status);
-        
-        return createJsonResponse({
-          status: latestPayment.status,
-          payment_id: latestPayment.id,
-          status_detail: latestPayment.status_detail,
-          message: getStatusMessage(latestPayment.status, latestPayment.status_detail)
-        });
-      }
-    } else {
-      Logger.log("❌ No se encontraron pagos para esta preferencia");
-      return createJsonResponse({
-        status: "not_found",
-        message: "No se encontró ningún pago para esta transacción. Por favor completa el pago primero."
-      });
-    }
-    
-  } catch (e) {
-    Logger.log("💥 Error verificando pago: " + e.toString());
-    return createJsonResponse({
-      status: "error",
-      message: e.toString()
-    });
-  }
-}
-
-// ==========================================
-// VERIFICAR PAGO POR NÚMERO DE OPERACIÓN (Payment ID)
-// ==========================================
-function handleVerifyByPaymentId(p) {
-  Logger.log("=== VERIFY_BY_PAYMENT_ID ===");
-  Logger.log("Payment ID: " + p.payment_id);
-  Logger.log("Items: " + p.items);
-  Logger.log("Email: " + p.email);
-  Logger.log("Customer: " + p.customer_name);
-  
-  if (!p.payment_id) {
-    return createJsonResponse({
-      status: "ERROR",
-      message: "Se requiere el número de operación (payment_id)"
-    });
-  }
-  
-  try {
-    // Buscar el pago directamente por su ID
-    const url = "https://api.mercadopago.com/v1/payments/" + p.payment_id;
-    
-    const options = {
-      method: "get",
-      headers: {
-        "Authorization": "Bearer " + MP_ACCESS_TOKEN
-      },
-      muteHttpExceptions: true
-    };
-    
-    Logger.log("📡 Buscando pago con ID: " + p.payment_id);
-    
-    const response = UrlFetchApp.fetch(url, options);
-    const responseText = response.getContentText();
-    const responseCode = response.getResponseCode();
-    
-    Logger.log("📨 Respuesta (" + responseCode + "): " + responseText);
-    
-    if (responseCode === 200) {
-      const payment = JSON.parse(responseText);
-      
-      if (payment.status === 'approved') {
-        Logger.log("✅ Pago aprobado encontrado: " + payment.id);
-        
-        // Actualizar el registro pendiente a APROBADO
-        try {
-          const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-          let sheet = ss.getSheetByName("Ventas");
-          
-          if (sheet) {
-            const data = sheet.getDataRange().getValues();
-            
-            // Buscar si ya existe este payment_id
-            let paymentExists = false;
-            for (let i = 1; i < data.length; i++) {
-              if (String(data[i][2]) === String(payment.id)) {
-                paymentExists = true;
-                break;
-              }
-            }
-            
-            if (!paymentExists) {
-              // Buscar la fila pendiente con este preference_id y actualizarla
-              let updated = false;
-              for (let i = 1; i < data.length; i++) {
-                // Si hay una fila pendiente (sin payment_id específico)
-                if (data[i][2] === "PENDIENTE" && data[i][8] === "🟡 PENDIENTE") {
-                  // Actualizar esta fila
-                  sheet.getRange(i + 1, 3).setValue(payment.id); // Payment ID
-                  sheet.getRange(i + 1, 9).setValue("✅ APROBADO"); // Estado
-                  updated = true;
-                  Logger.log("✅ Fila " + (i + 1) + " actualizada a APROBADO");
-                  break;
-                }
-              }
-              
-              // Si no encontró pendiente, crear nueva fila
-              if (!updated) {
-                let items = [];
-                try {
-                  if (p.items) {
-                    items = JSON.parse(decodeURIComponent(p.items));
-                  }
-                } catch (parseError) {
-                  items = [{ name: "Producto", price: payment.transaction_amount }];
-                }
-                
-                const itemNames = items.map(function(item) { return item.name; }).join(", ");
-                
-                sheet.appendRow([
-                  new Date(),
-                  payment.preference_id || "N/A",
-                  payment.id,
-                  p.customer_name || "Cliente",
-                  payment.payer?.email || p.email || "N/A",
-                  itemNames || "Productos Gestiosafe",
-                  payment.transaction_amount,
-                  payment.currency_id || "PEN",
-                  "✅ APROBADO"
-                ]);
-                Logger.log("✅ Nueva fila creada con pago APROBADO");
-              }
-            } else {
-              Logger.log("ℹ️ Pago ya estaba registrado");
-            }
-          }
-        } catch (sheetError) {
-          Logger.log("⚠️ Error actualizando venta: " + sheetError.toString());
-        }
-        
-        return createJsonResponse({
-          status: "approved",
-          payment_id: payment.id,
-          amount: payment.transaction_amount,
-          currency: payment.currency_id,
-          payer_email: payment.payer?.email,
-          date: payment.date_approved,
-          message: "¡Pago verificado exitosamente!"
-        });
-      } else {
-        Logger.log("⏳ Pago encontrado pero estado: " + payment.status);
-        return createJsonResponse({
-          status: payment.status,
-          payment_id: payment.id,
-          status_detail: payment.status_detail,
-          message: getStatusMessage(payment.status, payment.status_detail)
-        });
-      }
-    } else if (responseCode === 404) {
-      Logger.log("❌ No se encontró el pago con ID: " + p.payment_id);
-      return createJsonResponse({
-        status: "not_found",
-        message: "No se encontró ningún pago con ese número de operación. Verifica que sea correcto."
-      });
-    } else {
-      const errorData = JSON.parse(responseText);
-      Logger.log("❌ Error de API: " + JSON.stringify(errorData));
-      return createJsonResponse({
-        status: "error",
-        message: errorData.message || "Error al verificar el pago"
-      });
-    }
-    
-  } catch (e) {
-    Logger.log("💥 Error verificando pago: " + e.toString());
-    return createJsonResponse({
-      status: "error",
-      message: e.toString()
-    });
-  }
-}
-
-// ==========================================
-// CREAR PREFERENCIA DE MERCADO PAGO
-// ==========================================
-function handleCreateMPPreference(p) {
-    Logger.log("=== INICIANDO CREATE_MP_PREFERENCE ===");
-    Logger.log("Datos recibidos: " + JSON.stringify(p));
-
-    if (!p.total || isNaN(parseFloat(p.total))) {
-        Logger.log("❌ Error: Monto total inválido");
-        return createJsonResponse({ status: "ERROR", message: "Monto total inválido." });
-    }
-
-    // Generar un ID único para esta transacción
-    const transactionId = "GS-" + new Date().getTime();
-
-    const url = "https://api.mercadopago.com/checkout/preferences";
-
-    // URL de retorno - usar la que envía el frontend o una por defecto
-    const backUrl = p.back_url || "https://gestiosafe.com";
-
-    const payload = {
-        items: [
-            {
-                title: p.title || "Producto Gestiosafe",
-                quantity: 1,
-                currency_id: p.currency_id || "PEN",
-                unit_price: parseFloat(p.total)
-            }
-        ],
-        payer: {
-            email: p.email || "test@user.com",
-            name: p.customer_name || "Cliente",
-            surname: "Gestiosafe"
-        },
-        back_urls: {
-            success: backUrl,
-            failure: backUrl,
-            pending: backUrl
-        },
-        external_reference: transactionId,
-        auto_return: "approved",
-        binary_mode: false
-    };
-
-    Logger.log("Payload: " + JSON.stringify(payload));
-
-    const options = {
-        method: "post",
-        contentType: "application/json",
-        headers: {
-            "Authorization": "Bearer " + MP_ACCESS_TOKEN
-        },
-        payload: JSON.stringify(payload),
-        muteHttpExceptions: true
-    };
-
-    try {
-        Logger.log("📡 Enviando request a Mercado Pago: " + url);
-        Logger.log("🔐 Token usado: " + (MP_ACCESS_TOKEN ? "✅ Presente" : "❌ Ausente"));
-
-        const response = UrlFetchApp.fetch(url, options);
-        const responseText = response.getContentText();
-        const responseCode = response.getResponseCode();
-
-        Logger.log("📨 Respuesta HTTP (" + responseCode + "): " + responseText);
-
-        const data = JSON.parse(responseText);
-
-        if ((responseCode === 200 || responseCode === 201) && data.id) {
-            Logger.log("✅ ÉXITO: Preferencia creada");
-            Logger.log("ID: " + data.id);
-            Logger.log("init_point: " + data.init_point);
-            
-            // REGISTRAR COMPRA COMO PENDIENTE
-            try {
-              const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-              let sheet = ss.getSheetByName("Ventas");
-              
-              // Crear la hoja si no existe
-              if (!sheet) {
-                sheet = ss.insertSheet("Ventas");
-                sheet.appendRow([
-                  "Fecha",
-                  "Preference ID",
-                  "Payment ID", 
-                  "Cliente",
-                  "Email",
-                  "Items",
-                  "Total",
-                  "Moneda",
-                  "Estado"
-                ]);
-              }
-              
-              // Registrar como pendiente
-              sheet.appendRow([
-                new Date(),
-                data.id,
-                "PENDIENTE",
-                p.customer_name || "Cliente",
-                p.email || "N/A",
-                p.title || "Productos Gestiosafe",
-                parseFloat(p.total),
-                p.currency_id || "PEN",
-                "🟡 PENDIENTE"
-              ]);
-              
-              Logger.log("✅ Compra registrada como PENDIENTE");
-            } catch (sheetError) {
-              Logger.log("⚠️ Error registrando pendiente: " + sheetError.toString());
-            }
-            
-            return createJsonResponse({ 
-                status: "SUCCESS", 
-                preferenceId: data.id, 
-                init_point: data.init_point,
-                transactionId: transactionId
-            });
-        } else {
-            Logger.log("❌ FALLO: MP devolvió error o no hay ID");
-            Logger.log("Response Data: " + JSON.stringify(data));
-            return createJsonResponse({
-                status: "ERROR",
-                message: "Error al crear preferencia en Mercado Pago",
-                details: data
-            });
-        }
-
-    } catch (e) {
-        Logger.log("💥 EXCEPCIÓN: " + e.toString());
-        Logger.log("Stack: " + e.stack);
-        return createJsonResponse({ 
-            status: "ERROR", 
-            message: e.toString()
-        });
-    }
-}
-
 function doPost(e) {
+  Logger.log("=== 📬 DO_POST RECIBIDO ===");
   try {
-    Logger.log("=== DO_POST RECIBIDO ===");
-    
-    // Intentar parsear como JSON primero
-    let requestData;
+    let data;
     if (e.postData && e.postData.contents) {
       Logger.log("PostData: " + e.postData.contents);
-      requestData = JSON.parse(e.postData.contents);
+      data = JSON.parse(e.postData.contents);
     } else {
-      requestData = e.parameter;
+      data = e.parameter;
     }
     
-    Logger.log("Datos parseados: " + JSON.stringify(requestData));
+    Logger.log("Datos: " + JSON.stringify(data));
     
-    // Si es un pago con tarjeta
-    if (requestData.action === 'PROCESS_CARD_PAYMENT') {
-      return handleProcessCardPayment(requestData);
+    if (data.action === 'PROCESS_CARD_PAYMENT') {
+      return handleProcessCardPayment(data);
     }
     
-    // Registro de venta tradicional
-    const p = requestData;
-    Logger.log("Registrando venta: " + JSON.stringify(p));
-    
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sheet = ss.getSheetByName("Ventas");
-    sheet.appendRow([
-      new Date(),
-      p.firstName || "N/A",
-      p.lastName || "N/A",
-      p.email || "N/A",
-      p.docNumber || "N/A",
-      p.phone || "N/A",
-      p.order || "N/A",
-      p.total || "0",
-      "Mercado Pago"
-    ]);
-    
-    Logger.log("✅ Venta registrada exitosamente");
-    return createJsonResponse({ status: "success", message: "Venta registrada" });
+    return jsonResponse({ status: "ok", message: "Recibido" });
   } catch (e) {
-    Logger.log("❌ Error en doPost: " + e.toString());
-    return createJsonResponse({ status: "error", message: e.toString() });
+    Logger.log("❌ Error: " + e.toString());
+    return jsonResponse({ status: "error", message: e.toString() });
   }
 }
 
-// ==========================================
-// PROCESAR PAGO CON TARJETA (Card Payment Brick)
-// ==========================================
 function handleProcessCardPayment(data) {
-  Logger.log("=== PROCESS_CARD_PAYMENT ===");
-  Logger.log("Payment Data: " + JSON.stringify(data));
-  
-  const paymentData = data.paymentData;
-  const url = "https://api.mercadopago.com/v1/payments";
-  
-  // Construir el payload para el pago
-  const payload = {
-    transaction_amount: parseFloat(data.amount),
-    token: paymentData.token,
-    description: data.description || "Compra Gestiosafe",
-    installments: paymentData.installments || 1,
-    payment_method_id: paymentData.payment_method_id,
-    issuer_id: paymentData.issuer_id,
-    payer: {
-      email: data.email || paymentData.payer?.email || "test@test.com",
-      identification: paymentData.payer?.identification || {
-        type: "DNI",
-        number: "12345678"
-      }
-    }
-  };
-  
-  Logger.log("Payload de pago: " + JSON.stringify(payload));
-  
-  const options = {
-    method: "post",
-    contentType: "application/json",
-    headers: {
-      "Authorization": "Bearer " + MP_ACCESS_TOKEN,
-      "X-Idempotency-Key": Utilities.getUuid()
-    },
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-  
-  try {
-    Logger.log("📡 Enviando pago a Mercado Pago...");
-    const response = UrlFetchApp.fetch(url, options);
-    const responseText = response.getContentText();
-    const responseCode = response.getResponseCode();
-    
-    Logger.log("📨 Respuesta (" + responseCode + "): " + responseText);
-    
-    const result = JSON.parse(responseText);
-    
-    if (responseCode === 200 || responseCode === 201) {
-      Logger.log("✅ Pago procesado: " + result.status);
-      
-      // Si el pago fue aprobado, registrar la venta
-      if (result.status === 'approved') {
-        try {
-          const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-          const sheet = ss.getSheetByName("Ventas");
-          sheet.appendRow([
-            new Date(),
-            paymentData.payer?.email || data.email || "N/A",
-            result.id,
-            result.status,
-            data.amount,
-            data.currency_id || "PEN",
-            result.payment_method_id,
-            "Card Payment Brick"
-          ]);
-          Logger.log("✅ Venta registrada en hoja");
-        } catch (sheetError) {
-          Logger.log("⚠️ Error registrando venta: " + sheetError.toString());
-        }
-      }
-      
-      return createJsonResponse({
-        status: result.status,
-        id: result.id,
-        status_detail: result.status_detail,
-        payment_method_id: result.payment_method_id
-      });
-    } else {
-      Logger.log("❌ Error en pago");
-      return createJsonResponse({
-        status: "error",
-        message: result.message || "Error procesando pago",
-        cause: result.cause,
-        details: result
-      });
-    }
-    
-  } catch (e) {
-    Logger.log("💥 Excepción: " + e.toString());
-    return createJsonResponse({
-      status: "error",
-      message: e.toString()
-    });
-  }
+  // Redirigir a la versión GET
+  return handleProcessCardPaymentGET(data);
 }
+

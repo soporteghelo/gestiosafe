@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
-
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRt4zbQ0Eustfhv5dkVbS4hG4mGebASpuEXuDD2NgOp1txUM616nTQ_X7qVXcTpkLTZA/exec";
+import { APPS_SCRIPT_URL } from '../config';
 
 interface PaymentCallbackProps {
   onClose: () => void;
