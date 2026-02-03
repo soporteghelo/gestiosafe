@@ -206,6 +206,7 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
       action: 'CREATE_MP_PREFERENCE',
       total: amountToPay.toString(),
       currency_id: selectedCurrency,
+      exchange_rate: EXCHANGE_RATE.toString(), // Enviar tipo de cambio usado
       email: formData.email,
       title: title
     });

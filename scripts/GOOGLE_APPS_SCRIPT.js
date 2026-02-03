@@ -190,6 +190,8 @@ function handleGetCatalog() {
 function handleCreateMPPreference(p) {
   Logger.log("=== 💳 CREATE_MP_PREFERENCE ===");
   Logger.log("Total: " + p.total);
+  Logger.log("Currency: " + (p.currency_id || "PEN"));
+  Logger.log("Exchange Rate (frontend): " + p.exchange_rate);
   Logger.log("Email: " + p.email);
   Logger.log("Cliente: " + p.customer_name);
   Logger.log("Título: " + p.title);
@@ -199,6 +201,12 @@ function handleCreateMPPreference(p) {
     Logger.log("❌ Monto inválido");
     return jsonResponse({ status: "ERROR", message: "Monto total inválido" });
   }
+  
+  // NOTA: El frontend ya envió el monto convertido usando EXCHANGE_RATE de config.ts
+  // Por ejemplo: Si el producto cuesta $10 USD y EXCHANGE_RATE=3.75, entonces:
+  //   - selectedCurrency='PEN' → total = 10 * 3.75 = 37.50 PEN
+  //   - selectedCurrency='USD' → total = 10.00 USD
+  // Así que aquí solo usamos el valor recibido directamente
 
   // Determinar URL de retorno
   let backUrl = p.back_url || "https://gestiosafe.com";
