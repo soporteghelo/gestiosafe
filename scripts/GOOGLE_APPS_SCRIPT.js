@@ -351,10 +351,11 @@ function getDownloadLinksForProducts(productIds) {
     const data = sheet.getDataRange().getValues();
     const headers = data[0];
     const idIndex = headers.indexOf("ID");
-    const linkIndex = headers.indexOf("Link de Descarga");
+    const linkIndex = headers.indexOf("Link"); // Nombre correcto de la columna
     
     if (idIndex === -1 || linkIndex === -1) {
-      Logger.log("❌ Columnas 'ID' o 'Link de Descarga' no encontradas");
+      Logger.log("❌ Columnas 'ID' o 'Link' no encontradas");
+      Logger.log("📋 Headers encontrados: " + JSON.stringify(headers));
       return [];
     }
     
