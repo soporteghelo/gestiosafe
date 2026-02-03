@@ -29,12 +29,12 @@ const TemplateCard: React.FC<TemplateCardProps> = ({ template, onSelect }) => {
           </span>
         </div>
         
-        {/* Badge Popular */}
-        {template.isPopular && (
+        {/* Badge Tipo de Archivo - esquina superior derecha */}
+        {template.fileType && template.fileType.length > 0 && (
           <div className="absolute top-1.5 right-1.5 lg:top-4 lg:right-4">
             <span className="bg-pragmo-green text-white text-[7px] lg:text-[9px] font-black px-1.5 py-0.5 lg:px-2.5 lg:py-1.5 rounded lg:rounded-lg uppercase tracking-wide shadow-lg flex items-center gap-0.5">
-              <span className="material-symbols-outlined text-[10px] lg:text-xs">star</span>
-              <span className="hidden sm:inline">Popular</span>
+              <span className="material-symbols-outlined text-[10px] lg:text-xs">description</span>
+              <span className="hidden sm:inline">{Array.isArray(template.fileType) ? template.fileType.join(', ') : template.fileType}</span>
             </span>
           </div>
         )}
