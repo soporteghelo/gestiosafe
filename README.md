@@ -1,99 +1,103 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# GESTIOSAFE - E-Commerce de Plantillas Digitales
 
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+Plataforma de venta de plantillas digitales SST con integración de Mercado Pago.
 
-# 🛒 GESTIOSAFE - E-Commerce de Plantillas SST
-
-Plataforma de e-commerce especializada en plantillas de **Seguridad y Salud en el Trabajo (SST)** para empresas en Perú.
-
-## ✨ Características
-
-- 🎨 Catálogo completo de plantillas SST
-- 🛒 Carrito de compras funcional
-- 💳 Pagos integrados con Mercado Pago
-- 🔍 Búsqueda y filtros avanzados
-- 📱 Diseño responsive (mobile-first)
-- 🚀 Built con React 19 + TypeScript + Vite
+## 🌐 Sitio Web
+**https://www.gestiosafe.com**
 
 ---
 
-## 🚀 Quick Start
+## 📁 Estructura del Proyecto
 
-### 1. Instalar dependencias
+```
+GESTIOSAFE/
+├── components/           # Componentes React
+│   ├── CheckoutModal.tsx    # Modal de checkout con Mercado Pago
+│   ├── PaymentCallback.tsx  # Manejo de retorno de pago
+│   └── TemplateCard.tsx     # Tarjeta de producto
+├── context/              # Contextos de React
+│   └── CartContext.tsx      # Estado global del carrito
+├── scripts/              # Scripts externos
+│   └── GOOGLE_APPS_SCRIPT.js # Código para Google Apps Script
+├── docs/                 # Documentación adicional
+├── App.tsx               # Componente principal
+├── config.ts             # Configuración centralizada
+├── constants.ts          # Catálogo de plantillas (fallback)
+├── types.ts              # Tipos TypeScript
+├── index.html            # HTML principal
+├── index.tsx             # Punto de entrada React
+└── vercel.json           # Configuración de Vercel
+```
+
+---
+
+## ⚙️ Configuración
+
+### 1. Variables de Entorno (`.env.local`)
+```env
+VITE_MERCADOPAGO_PUBLIC_KEY=APP_USR-xxxxxxxx
+```
+
+### 2. Config Principal (`config.ts`)
+- `APPS_SCRIPT_URL` - URL del Google Apps Script desplegado
+- `EXCHANGE_RATE` - Tipo de cambio USD → PEN
+- `WHATSAPP_NUMBER` - Número de contacto
+
+### 3. Google Apps Script
+1. Ve a [Google Apps Script](https://script.google.com)
+2. Crea un nuevo proyecto
+3. Copia el contenido de `scripts/GOOGLE_APPS_SCRIPT.js`
+4. Despliega como "Aplicación web"
+5. Actualiza la URL en `config.ts`
+
+---
+
+## 🚀 Desarrollo Local
 
 ```bash
+# Instalar dependencias
 npm install
-```
 
-### 2. Configurar Mercado Pago ⚠️ IMPORTANTE
-
-```bash
-cp .env.example .env.local
-# Edita .env.local y agrega tu clave pública
-VITE_MERCADOPAGO_PUBLIC_KEY=APP_USR-tu-clave-aqui
-```
-
-Obtén tu clave en: https://www.mercadopago.com.pe/developers/panel
-
-### 3. Ejecutar desarrollo
-
-```bash
+# Iniciar servidor de desarrollo
 npm run dev
+
+# Construir para producción
+npm run build
 ```
 
 ---
 
-## 📋 Documentación
+## 💳 Flujo de Pago
 
-| Documento | Propósito |
-|-----------|-----------|
-| [INICIO_RAPIDO.md](INICIO_RAPIDO.md) | 3 pasos para empezar |
-| [MERCADOPAGO_SETUP.md](MERCADOPAGO_SETUP.md) | Setup detallado |
-| [DIAGNOSTICO_PAGOS.md](DIAGNOSTICO_PAGOS.md) | Troubleshooting |
-
----
-
-## 🧪 Pruebas
-
-Tarjeta de prueba (Sandbox):
-- Número: `4444 4444 4444 4444`
-- Fecha: 12/26
-- CVV: 123
+1. Usuario agrega productos al carrito
+2. Completa formulario de checkout
+3. Se crea preferencia en Mercado Pago (vía Apps Script)
+4. Usuario completa pago en Mercado Pago
+5. MP redirige a `www.gestiosafe.com` con parámetros
+6. Se verifica el pago y se muestran los links de descarga
 
 ---
 
-## 🏗️ Estructura
+## 📊 Google Sheets
 
-```
-src/
-├── components/
-│   ├── CheckoutModal.tsx
-│   └── ImprovedPaymentCheckout.tsx  ✨ NUEVO
-├── context/CartContext.tsx
-└── App.tsx
-```
+El Apps Script usa un Spreadsheet con estas hojas:
+- **Plantillas** - Catálogo de productos
+- **Ventas** - Registro de transacciones
 
 ---
 
-## 🔒 Seguridad
+## 🔧 Tecnologías
 
-✅ Clave de MP en `.env.local` (no en código)
-✅ Validación de credenciales
-✅ Sanitización de datos
-
----
-
-## 🆘 ¿Problemas?
-
-1. Verifica `.env.local` configurado
-2. Abre DevTools (F12)
-3. Lee [DIAGNOSTICO_PAGOS.md](DIAGNOSTICO_PAGOS.md)
+- React 19 + TypeScript
+- Vite
+- Tailwind CSS
+- Mercado Pago Checkout Pro
+- Google Apps Script
+- Vercel (hosting)
 
 ---
 
-**¡Listo para vender! 🚀**
+## 📞 Soporte
+
+WhatsApp: +51 983 113 140
 
