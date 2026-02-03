@@ -156,6 +156,8 @@ function handleGetCatalog() {
     const data = sheet.getDataRange().getValues();
     const headers = data[0];
     const rows = data.slice(1);
+    
+    Logger.log("📋 Headers encontrados: " + JSON.stringify(headers));
 
     const result = rows.map(row => {
       let obj = {};
@@ -168,6 +170,11 @@ function handleGetCatalog() {
       });
       return obj;
     });
+    
+    // Log del primer item para debug
+    if (result.length > 0) {
+      Logger.log("📦 Primer item (ejemplo): " + JSON.stringify(result[0]));
+    }
     
     Logger.log("✅ Catálogo: " + result.length + " items");
     return jsonResponse(result);
@@ -193,8 +200,23 @@ function handleCreateMPPreference(p) {
     return jsonResponse({ status: "ERROR", message: "Monto total inválido" });
   }
 
-  const backUrl = p.back_url || "https://gestiosafe.com";
+  // Determinar URL de retorno
+  let backUrl = p.back_url || "https://gestiosafe.com";
   const transactionId = "GS-" + Date.now();
+  
+  // Verificar si es una URL válida para auto_return (debe ser HTTPS público)
+  const isValidForAutoReturn = backUrl.startsWith("https://") && 
+                                !backUrl.includes("localhost") && 
+                                !backUrl.includes("192.168.") &&
+                                !backUrl.includes("127.0.0.1");
+  
+  Logger.log("🔗 URL válida para auto_return: " + isValidForAutoReturn);
+  
+  // Si es desarrollo local, usar URL de producción para back_urls
+  if (!isValidForAutoReturn) {
+    Logger.log("⚠️ URL local detectada, usando gestiosafe.com para back_urls");
+    backUrl = "https://gestiosafe.com";
+  }
   
   const payload = {
     items: [{
@@ -212,9 +234,13 @@ function handleCreateMPPreference(p) {
       failure: backUrl,
       pending: backUrl
     },
-    auto_return: "approved",
     external_reference: transactionId
   };
+  
+  // Solo agregar auto_return si la URL es válida (HTTPS público)
+  if (isValidForAutoReturn) {
+    payload.auto_return = "approved";
+  }
 
   Logger.log("📦 Payload MP: " + JSON.stringify(payload));
 

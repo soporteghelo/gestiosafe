@@ -71,6 +71,7 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
           const data = await res.json();
 
           console.log('📥 Respuesta verificación:', data);
+          console.log('🛒 Cart Items recuperados:', cartItems);
 
           if (data.status === 'approved') {
             setPaymentData(data);
@@ -78,9 +79,16 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
             setMessage('¡Pago exitoso!');
             
             // Preparar enlaces de descarga
+            console.log('🔗 Procesando links de descarga...');
             const links: DownloadLink[] = cartItems
-              .filter((item: any) => item.link && item.link !== '#')
+              .filter((item: any) => {
+                const hasLink = item.link && item.link !== '#' && item.link !== '';
+                console.log(`  - ${item.name}: link="${item.link}" válido=${hasLink}`);
+                return hasLink;
+              })
               .map((item: any) => ({ name: item.name, link: item.link }));
+            
+            console.log('✅ Links de descarga encontrados:', links);
             setDownloadLinks(links);
 
             // Limpiar localStorage y carrito
