@@ -270,8 +270,16 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     };
     
     console.log('💾 Guardando checkout data:', checkoutData);
-    localStorage.setItem('gestiosafe_pending_checkout', JSON.stringify(checkoutData));
-    addLog('💾 Datos guardados en localStorage para recuperar después del pago');
+    
+    // Guardar en múltiples lugares para redundancia
+    const checkoutDataStr = JSON.stringify(checkoutData);
+    localStorage.setItem('gestiosafe_pending_checkout', checkoutDataStr);
+    sessionStorage.setItem('gestiosafe_pending_checkout', checkoutDataStr);
+    
+    // También guardar en cookie como fallback (funciona entre www y non-www)
+    document.cookie = `gestiosafe_checkout=${encodeURIComponent(checkoutDataStr)}; path=/; max-age=3600; SameSite=Lax`;
+    
+    addLog('💾 Datos guardados en localStorage, sessionStorage y cookie');
 
     // La URL de retorno - asegurar que sea una URL válida completa
     let backUrl = window.location.origin + window.location.pathname;

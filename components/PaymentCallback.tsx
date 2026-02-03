@@ -50,22 +50,55 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
           let total = 0;
           let curr = 'PEN';
 
-          // Recuperar de localStorage
-          const savedCheckout = localStorage.getItem('gestiosafe_pending_checkout');
-          if (savedCheckout) {
-            const parsed = JSON.parse(savedCheckout);
-            cartItems = parsed.items || [];
-            customer = parsed.customer || { email: '', name: '' };
-            total = parsed.total || 0;
-            curr = parsed.currency || 'PEN';
-            console.log('📦 Datos recuperados de localStorage:', parsed);
+          // Función para obtener cookie
+          const getCookie = (name: string): string | null => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+              const val = parts.pop()?.split(';').shift();
+              return val ? decodeURIComponent(val) : null;
+            }
+            return null;
+          };
+
+          // Intentar recuperar de múltiples fuentes (por problemas de www vs non-www)
+          console.log('🔍 Buscando datos del checkout...');
+          
+          let savedData: string | null = null;
+          
+          // 1. Intentar localStorage
+          savedData = localStorage.getItem('gestiosafe_pending_checkout');
+          if (savedData) console.log('✅ Encontrado en localStorage');
+          
+          // 2. Si no hay, intentar sessionStorage
+          if (!savedData) {
+            savedData = sessionStorage.getItem('gestiosafe_pending_checkout');
+            if (savedData) console.log('✅ Encontrado en sessionStorage');
+          }
+          
+          // 3. Si no hay, intentar cookie
+          if (!savedData) {
+            savedData = getCookie('gestiosafe_checkout');
+            if (savedData) console.log('✅ Encontrado en cookie');
+          }
+          
+          if (savedData) {
+            try {
+              const parsed = JSON.parse(savedData);
+              cartItems = parsed.items || [];
+              customer = parsed.customer || { email: '', name: '' };
+              total = parsed.total || 0;
+              curr = parsed.currency || 'PEN';
+              console.log('📦 Datos recuperados:', parsed);
+              console.log('📦 Items encontrados:', cartItems.length);
+            } catch (parseError) {
+              console.error('❌ Error parseando datos:', parseError);
+            }
+          } else {
+            console.warn('⚠️ No hay datos guardados - intentando recuperar solo del backend');
           }
 
-          setCustomerData(customer);
-          setTotalPaid(total);
-          setCurrency(curr);
-
-          // Verificar con el backend
+          // Verificar con el backend - el backend nos dará info del pago
           const query = new URLSearchParams({
             action: 'VERIFY_BY_PAYMENT_ID',
             payment_id: paymentId,
@@ -78,12 +111,34 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
           const data = await res.json();
 
           console.log('📥 Respuesta verificación:', data);
-          console.log('🛒 Cart Items:', cartItems);
+          console.log('🛒 Cart Items locales:', cartItems);
 
           if (data.status === 'approved') {
             setPaymentData(data);
             setStatus('success');
             setMessage('¡Pago exitoso!');
+
+            // Si no tenemos items del localStorage, usar datos del pago
+            if (cartItems.length === 0 && data.amount) {
+              total = data.amount;
+              curr = data.currency || 'PEN';
+              customer.email = data.payer_email || '';
+            }
+            
+            // Actualizar con datos del pago de MP
+            if (data.amount && total === 0) {
+              total = data.amount;
+            }
+            if (data.currency) {
+              curr = data.currency;
+            }
+            if (data.payer_email && !customer.email) {
+              customer.email = data.payer_email;
+            }
+
+            setCustomerData(customer);
+            setTotalPaid(total);
+            setCurrency(curr);
 
             // Guardar items comprados
             const items: PurchasedItem[] = cartItems.map((item: any) => ({
