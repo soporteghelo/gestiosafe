@@ -493,9 +493,9 @@ const AppContent: React.FC = () => {
               </button>
             </div>
           </div>
-          <div className="relative hidden lg:block">
-            <div className="relative z-10 bg-slate-800 p-3 rounded-[2.5rem] shadow-2xl border-4 border-slate-700/50">
-              <div className="bg-slate-900 rounded-[2rem] overflow-hidden aspect-[16/11] relative">
+          <div className="relative hidden lg:block lg:scale-110 lg:translate-x-8">
+            <div className="relative z-10 bg-slate-800 p-4 rounded-[2.5rem] shadow-2xl border-4 border-slate-700/50">
+              <div className="bg-slate-900 rounded-[2rem] overflow-hidden aspect-[16/10] relative">
                 <img src={HERO_IMAGE_URL} className="w-full h-full object-cover" alt="Plantillas SST Profesionales" />
               </div>
             </div>
