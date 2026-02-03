@@ -109,19 +109,15 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     addLog(`🔍 Verificando pago #${paymentIdInput}...`);
 
     try {
-      // Preparar los items para enviar al backend
-      const itemsForBackend = cart.map(item => ({
-        name: item.name,
-        price: selectedCurrency === 'PEN' ? item.price * EXCHANGE_RATE : item.price,
-        link: item.link || ''
-      }));
+      // 🔒 SEGURIDAD: Solo enviar IDs de productos, NO los links
+      const productIds = cart.map(item => item.id).filter(Boolean);
 
       const query = new URLSearchParams({
         action: 'VERIFY_BY_PAYMENT_ID',
         payment_id: paymentIdInput.trim(),
         email: formData.email,
         customer_name: `${formData.firstName} ${formData.lastName}`,
-        items: encodeURIComponent(JSON.stringify(itemsForBackend))
+        product_ids: encodeURIComponent(JSON.stringify(productIds))
       });
 
       const res = await fetch(`${APPS_SCRIPT_URL}?${query.toString()}`);
@@ -160,19 +156,15 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     addLog("🔍 Verificando estado del pago...");
 
     try {
-      // Preparar los items para enviar al backend
-      const itemsForBackend = cart.map(item => ({
-        name: item.name,
-        price: selectedCurrency === 'PEN' ? item.price * EXCHANGE_RATE : item.price,
-        link: item.link || ''
-      }));
+      // 🔒 SEGURIDAD: Solo enviar IDs de productos, NO los links
+      const productIds = cart.map(item => item.id).filter(Boolean);
 
       const query = new URLSearchParams({
         action: 'VERIFY_PAYMENT',
         preference_id: mpPreferenceId,
         email: formData.email,
         customer_name: `${formData.firstName} ${formData.lastName}`,
-        items: encodeURIComponent(JSON.stringify(itemsForBackend))
+        product_ids: encodeURIComponent(JSON.stringify(productIds))
       });
 
       const res = await fetch(`${APPS_SCRIPT_URL}?${query.toString()}`);

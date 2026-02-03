@@ -492,11 +492,25 @@ function handleVerifyPayment(p) {
       
       if (payment.status === "approved") {
         actualizarVentaAprobada(payment.id, payment, p);
+        
+        // 🔒 SEGURIDAD: Obtener links de descarga solo si el pago está aprobado
+        let downloadLinks = [];
+        if (p.product_ids) {
+          try {
+            const productIds = JSON.parse(p.product_ids);
+            Logger.log("🔒 Obteniendo links para productos aprobados: " + JSON.stringify(productIds));
+            downloadLinks = getDownloadLinksForProducts(productIds);
+          } catch (e) {
+            Logger.log("⚠️ Error parseando product_ids: " + e.toString());
+          }
+        }
+        
         return jsonResponse({
           status: "approved",
           payment_id: payment.id,
           amount: payment.transaction_amount,
-          message: "¡Pago verificado!"
+          message: "¡Pago verificado!",
+          download_links: downloadLinks  // 🔒 SOLO disponibles si pago aprobado
         });
       } else {
         return jsonResponse({ status: payment.status, message: "Estado: " + payment.status });
