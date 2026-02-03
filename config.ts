@@ -4,7 +4,7 @@
 
 // URL de Google Apps Script - CAMBIA SOLO AQUÍ
 // Después de hacer una nueva implementación en Apps Script, actualiza esta URL
-export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJUZwbgBAdy0RqnM_ubZ-JEjxeC0wMT-jljMqPKhhoG-zsnwi9y0qY_uzLnU6QDrh-WA/exec";
+export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxstAxgC623lIL_5e30P5S8DD_jPQ63qDrJGrnsGJKaIBAw1SVnYuirFHNhc8BUceEXXA/exec";
 
 // Mercado Pago Public Key
 export const MERCADOPAGO_PUBLIC_KEY = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || "APP_USR-NOT_CONFIGURED";

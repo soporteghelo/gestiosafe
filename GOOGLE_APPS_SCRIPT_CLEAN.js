@@ -64,9 +64,16 @@ function jsonResponse(data) {
 // ==========================================
 // TEST: Simular registro de venta exitoso
 // Llama con: ?action=TEST_REGISTRO&email=test@test.com
+// O ejecuta directamente desde el editor
 // ==========================================
 function testRegistroVenta(p) {
   Logger.log("=== 🧪 TEST REGISTRO VENTA ===");
+  
+  // Si p es undefined (ejecución desde editor), crear objeto vacío
+  if (!p) {
+    p = {};
+    Logger.log("⚠️ Ejecutando desde editor (sin parámetros URL)");
+  }
   
   try {
     Logger.log("1️⃣ Abriendo Spreadsheet...");
@@ -102,11 +109,11 @@ function testRegistroVenta(p) {
       new Date(),
       "TEST-" + Date.now(),
       "PREF-TEST-" + Date.now(),
-      p.customer_name || "Cliente Test",
-      p.email || "test@test.com",
-      p.items || "Producto de Prueba",
-      p.total || "100.00",
-      p.currency || "PEN",
+      (p && p.customer_name) ? p.customer_name : "Cliente Test",
+      (p && p.email) ? p.email : "test@test.com",
+      (p && p.items) ? p.items : "Producto de Prueba",
+      (p && p.total) ? p.total : "100.00",
+      (p && p.currency) ? p.currency : "PEN",
       "✅ APROBADO (TEST)"
     ];
     

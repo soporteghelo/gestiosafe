@@ -263,8 +263,17 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     localStorage.setItem('gestiosafe_pending_checkout', JSON.stringify(checkoutData));
     addLog('💾 Datos guardados en localStorage para recuperar después del pago');
 
-    // La URL de retorno será la página actual (donde está la app)
-    const backUrl = window.location.origin + window.location.pathname;
+    // La URL de retorno - asegurar que sea una URL válida completa
+    let backUrl = window.location.origin + window.location.pathname;
+    // Si estamos en localhost, usar localhost con puerto
+    if (!backUrl || backUrl === 'null' || !backUrl.startsWith('http')) {
+      backUrl = window.location.href.split('?')[0]; // URL actual sin parámetros
+    }
+    // Asegurar que sea una URL válida para MP
+    if (!backUrl.startsWith('http')) {
+      backUrl = 'https://gestiosafe.com'; // Fallback a producción
+    }
+    addLog(`🔗 Back URL: ${backUrl}`);
 
     const query = new URLSearchParams({
       action: 'CREATE_MP_PREFERENCE',
