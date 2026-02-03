@@ -337,7 +337,7 @@ const AppContent: React.FC = () => {
                 <span className="material-symbols-outlined text-sm">business</span>
                 Sector
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <button onClick={() => setActiveSector(null)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${!activeSector ? 'bg-pragmo-cyan text-slate-900' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>Todos</button>
                 {sectors.map(s => (
                   <button key={s} onClick={() => setActiveSector(s)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${activeSector === s ? 'bg-pragmo-cyan text-slate-900' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>{s}</button>
@@ -351,7 +351,7 @@ const AppContent: React.FC = () => {
                 <span className="material-symbols-outlined text-sm">category</span>
                 Categoría
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <button onClick={() => setActiveCategory(null)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${!activeCategory ? 'bg-pragmo-green text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>Todas</button>
                 {categories.map(c => (
                   <button key={c} onClick={() => setActiveCategory(c)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${activeCategory === c ? 'bg-pragmo-green text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>{c}</button>
@@ -365,7 +365,7 @@ const AppContent: React.FC = () => {
                 <span className="material-symbols-outlined text-sm">description</span>
                 Tipo de Archivo
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <button onClick={() => setActiveFormat(null)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${!activeFormat ? 'bg-orange-500 text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>Todos</button>
                 {formats.map(f => (
                   <button key={f} onClick={() => setActiveFormat(f)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${activeFormat === f ? 'bg-orange-500 text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>{f}</button>

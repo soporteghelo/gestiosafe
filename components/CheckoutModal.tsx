@@ -249,24 +249,27 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     const title = cart.map(i => i.name).join(', ').substring(0, 200);
     const amountToPay = getAmountForPayment();
 
-    // Preparar items con precios en la moneda seleccionada
+    // Preparar items para el backend - SIN LINKS por seguridad
+    // Los links solo se obtienen del backend después de verificar el pago
     const itemsWithPrices = cart.map(i => ({
+      id: i.id,
       name: i.name,
       price: selectedCurrency === 'PEN' ? i.price * EXCHANGE_RATE : i.price,
-      link: i.link || '',
       description: i.description || '',
       imageUrl: i.imageUrl || ''
+      // NOTA: NO incluir link aquí por seguridad
     }));
 
     // Guardar datos del checkout en localStorage para recuperarlos después del pago
-    // IMPORTANTE: Guardar todos los datos necesarios para mostrar después del pago
+    // SEGURIDAD: NO guardamos los links - solo IDs de productos
+    // Los links se obtienen del backend SOLO después de verificar el pago
     const checkoutData = {
       items: cart.map(i => ({
         id: i.id,
         name: i.name,
         description: i.description || '',
         price: selectedCurrency === 'PEN' ? i.price * EXCHANGE_RATE : i.price,
-        link: i.link || '',
+        // SEGURIDAD: NO incluir link
         imageUrl: i.imageUrl || '',
         fileType: i.fileType || [],
         category: i.category || ''

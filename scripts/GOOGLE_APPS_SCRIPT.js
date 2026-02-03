@@ -325,6 +325,57 @@ function registrarVentaPendiente(preferenceId, p) {
 }
 
 // ==========================================
+// OBTENER LINKS DE DESCARGA POR IDS DE PRODUCTOS
+// ==========================================
+function getDownloadLinksForProducts(productIds) {
+  Logger.log("=== 🔗 GET_DOWNLOAD_LINKS ===");
+  Logger.log("Product IDs: " + JSON.stringify(productIds));
+  
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName("Plantillas");
+    
+    if (!sheet) {
+      Logger.log("❌ Hoja 'Plantillas' no encontrada");
+      return [];
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    const headers = data[0];
+    const idIndex = headers.indexOf("ID");
+    const linkIndex = headers.indexOf("Link de Descarga");
+    
+    if (idIndex === -1 || linkIndex === -1) {
+      Logger.log("❌ Columnas 'ID' o 'Link de Descarga' no encontradas");
+      return [];
+    }
+    
+    const links = [];
+    
+    // Buscar cada producto por su ID
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const productId = row[idIndex]?.toString();
+      const link = row[linkIndex]?.toString();
+      
+      if (productIds.includes(productId) && link) {
+        links.push({
+          id: productId,
+          link: link
+        });
+        Logger.log("✅ Link encontrado para producto: " + productId);
+      }
+    }
+    
+    Logger.log("📦 Total links encontrados: " + links.length);
+    return links;
+  } catch (e) {
+    Logger.log("❌ Error obteniendo links: " + e.toString());
+    return [];
+  }
+}
+
+// ==========================================
 // VERIFICAR POR PAYMENT ID (Número de operación)
 // ==========================================
 function handleVerifyByPaymentId(p) {
@@ -366,13 +417,26 @@ function handleVerifyByPaymentId(p) {
         // Actualizar registro a APROBADO
         actualizarVentaAprobada(payment.id, payment, p);
         
+        // 🔒 SEGURIDAD: Obtener links de descarga solo si el pago está aprobado
+        let downloadLinks = [];
+        if (p.product_ids) {
+          try {
+            const productIds = JSON.parse(p.product_ids);
+            Logger.log("🔒 Obteniendo links para productos aprobados: " + JSON.stringify(productIds));
+            downloadLinks = getDownloadLinksForProducts(productIds);
+          } catch (e) {
+            Logger.log("⚠️ Error parseando product_ids: " + e.toString());
+          }
+        }
+        
         return jsonResponse({
           status: "approved",
           payment_id: payment.id,
           amount: payment.transaction_amount,
           currency: payment.currency_id,
           payer_email: payment.payer?.email,
-          message: "¡Pago verificado exitosamente!"
+          message: "¡Pago verificado exitosamente!",
+          download_links: downloadLinks  // 🔒 SOLO disponibles si pago aprobado
         });
       } else {
         Logger.log("⏳ Pago no aprobado: " + payment.status);

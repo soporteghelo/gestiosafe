@@ -100,35 +100,30 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
             console.warn('⚠️ No hay datos guardados - intentando recuperar solo del backend');
           }
 
-          // Verificar con el backend - el backend nos dará info del pago
+          // Verificar con el backend - SEGURIDAD: enviar IDs de productos
+          // El backend verificará el pago y devolverá los links SOLO si está aprobado
+          const productIds = cartItems.map((item: any) => item.id).filter(Boolean);
+          
           const query = new URLSearchParams({
             action: 'VERIFY_BY_PAYMENT_ID',
             payment_id: paymentId,
             email: customer.email,
             customer_name: customer.name,
-            items: encodeURIComponent(JSON.stringify(cartItems))
+            product_ids: encodeURIComponent(JSON.stringify(productIds))
           });
 
           const res = await fetch(`${APPS_SCRIPT_URL}?${query.toString()}`);
           const data = await res.json();
 
           console.log('📥 Respuesta verificación:', data);
-          console.log('🛒 Cart Items locales:', cartItems);
 
           if (data.status === 'approved') {
             setPaymentData(data);
             setStatus('success');
             setMessage('¡Pago exitoso!');
 
-            // Si no tenemos items del localStorage, usar datos del pago
-            if (cartItems.length === 0 && data.amount) {
-              total = data.amount;
-              curr = data.currency || 'PEN';
-              customer.email = data.payer_email || '';
-            }
-            
             // Actualizar con datos del pago de MP
-            if (data.amount && total === 0) {
+            if (data.amount) {
               total = data.amount;
             }
             if (data.currency) {
@@ -142,30 +137,53 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
             setTotalPaid(total);
             setCurrency(curr);
 
-            // Guardar items comprados
-            const items: PurchasedItem[] = cartItems.map((item: any) => ({
-              id: item.id || '',
-              name: item.name || 'Producto',
-              description: item.description || '',
-              price: item.price || 0,
-              link: item.link || '',
-              imageUrl: item.imageUrl || '',
-              fileType: item.fileType || [],
-              category: item.category || ''
-            }));
+            // SEGURIDAD: Los links vienen del backend SOLO si el pago está aprobado
+            // Combinar datos locales (nombre, imagen) con links del backend
+            let itemsWithLinks: PurchasedItem[] = [];
+            
+            if (data.download_links && Array.isArray(data.download_links)) {
+              // Si el backend devuelve los links (pago verificado)
+              itemsWithLinks = cartItems.map((item: any) => {
+                const linkData = data.download_links.find((dl: any) => dl.id === item.id);
+                return {
+                  id: item.id || '',
+                  name: item.name || 'Producto',
+                  description: item.description || '',
+                  price: item.price || 0,
+                  link: linkData?.link || '', // Link del backend (seguro)
+                  imageUrl: item.imageUrl || '',
+                  fileType: item.fileType || [],
+                  category: item.category || ''
+                };
+              });
+              console.log('🔐 Links obtenidos del backend (pago verificado)');
+            } else {
+              // Fallback: usar datos locales sin links (el email tendrá los links)
+              itemsWithLinks = cartItems.map((item: any) => ({
+                id: item.id || '',
+                name: item.name || 'Producto',
+                description: item.description || '',
+                price: item.price || 0,
+                link: '', // Sin link hasta que llegue por email
+                imageUrl: item.imageUrl || '',
+                fileType: item.fileType || [],
+                category: item.category || ''
+              }));
+              console.log('📧 Links serán enviados por correo');
+            }
 
-            console.log('✅ Items comprados:', items);
-            setPurchasedItems(items);
+            console.log('✅ Items comprados:', itemsWithLinks);
+            setPurchasedItems(itemsWithLinks);
 
-            // Guardar en historial de compras (sessionStorage)
+            // Guardar en historial de compras (sessionStorage) - SOLO con pago verificado
             addPurchase({
               paymentId: paymentId!,
-              items: items.map(item => ({
+              items: itemsWithLinks.map(item => ({
                 id: item.id,
                 name: item.name,
                 description: item.description,
                 price: item.price,
-                link: item.link,
+                link: item.link, // Link seguro del backend
                 imageUrl: item.imageUrl,
                 category: item.category
               })),
@@ -175,6 +193,10 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
               customerName: customer.name
             });
 
+            // Limpiar datos locales (ya no los necesitamos)
+            localStorage.removeItem('gestiosafe_pending_checkout');
+            sessionStorage.removeItem('gestiosafe_pending_checkout');
+            
             // Limpiar URL sin recargar
             window.history.replaceState({}, '', window.location.pathname);
           } else {
