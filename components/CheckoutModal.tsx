@@ -276,22 +276,34 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     localStorage.setItem('gestiosafe_pending_checkout', checkoutDataStr);
     sessionStorage.setItem('gestiosafe_pending_checkout', checkoutDataStr);
     
-    // También guardar en cookie como fallback (funciona entre www y non-www)
-    document.cookie = `gestiosafe_checkout=${encodeURIComponent(checkoutDataStr)}; path=/; max-age=3600; SameSite=Lax`;
+    // También guardar en cookie como fallback (funciona entre www y non-www si se configura el dominio correctamente)
+    // IMPORTANTE: Usar domain=.gestiosafe.com para que funcione entre www y non-www
+    const isProduction = window.location.hostname.includes('gestiosafe.com');
+    if (isProduction) {
+      document.cookie = `gestiosafe_checkout=${encodeURIComponent(checkoutDataStr)}; path=/; max-age=3600; domain=.gestiosafe.com; SameSite=Lax`;
+    } else {
+      document.cookie = `gestiosafe_checkout=${encodeURIComponent(checkoutDataStr)}; path=/; max-age=3600; SameSite=Lax`;
+    }
     
     addLog('💾 Datos guardados en localStorage, sessionStorage y cookie');
 
-    // La URL de retorno - asegurar que sea una URL válida completa
-    let backUrl = window.location.origin + window.location.pathname;
-    // Si estamos en localhost, usar localhost con puerto
-    if (!backUrl || backUrl === 'null' || !backUrl.startsWith('http')) {
-      backUrl = window.location.href.split('?')[0]; // URL actual sin parámetros
+    // La URL de retorno - SIEMPRE usar https://gestiosafe.com (sin www) para consistencia
+    // Esto asegura que localStorage/sessionStorage funcionen correctamente
+    let backUrl: string;
+    
+    const currentHost = window.location.hostname;
+    if (currentHost.includes('gestiosafe.com')) {
+      // En producción, siempre usar el dominio sin www para consistencia
+      backUrl = 'https://gestiosafe.com';
+    } else if (currentHost === 'localhost' || currentHost.startsWith('192.168') || currentHost.startsWith('127.')) {
+      // En desarrollo local, usar la URL de producción para el retorno
+      backUrl = 'https://gestiosafe.com';
+    } else {
+      // Fallback
+      backUrl = 'https://gestiosafe.com';
     }
-    // Asegurar que sea una URL válida para MP
-    if (!backUrl.startsWith('http')) {
-      backUrl = 'https://gestiosafe.com'; // Fallback a producción
-    }
-    addLog(`🔗 Back URL: ${backUrl}`);
+    
+    addLog(`🔗 Back URL (normalizada): ${backUrl}`);
 
     const query = new URLSearchParams({
       action: 'CREATE_MP_PREFERENCE',
