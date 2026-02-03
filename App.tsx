@@ -333,42 +333,105 @@ const AppContent: React.FC = () => {
             
             {/* Filtro por Sector */}
             <div className="bg-slate-800 rounded-2xl p-4">
-              <p className="text-xs font-bold text-pragmo-cyan uppercase mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm">business</span>
-                Sector
+              <p className="text-xs font-bold text-pragmo-cyan uppercase mb-3 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm">business</span>
+                  Sector
+                </span>
+                {activeSector && (
+                  <button onClick={() => setActiveSector(null)} className="text-[10px] text-pragmo-cyan hover:text-cyan-300 font-bold">
+                    Limpiar
+                  </button>
+                )}
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                <button onClick={() => setActiveSector(null)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${!activeSector ? 'bg-pragmo-cyan text-slate-900' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>Todos</button>
+              <div className="flex flex-wrap gap-2">
                 {sectors.map(s => (
-                  <button key={s} onClick={() => setActiveSector(s)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${activeSector === s ? 'bg-pragmo-cyan text-slate-900' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>{s}</button>
+                  <button 
+                    key={s} 
+                    onClick={() => setActiveSector(activeSector === s ? null : s)} 
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all ${
+                      activeSector === s 
+                        ? 'bg-pragmo-cyan text-slate-900' 
+                        : 'bg-slate-700 text-slate-300 active:bg-slate-600'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      {activeSector === s ? 'check_circle' : 'add_circle'}
+                    </span>
+                    {s}
+                  </button>
                 ))}
               </div>
             </div>
             
             {/* Filtro por Categoría */}
             <div className="bg-slate-800 rounded-2xl p-4">
-              <p className="text-xs font-bold text-pragmo-green uppercase mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm">category</span>
-                Categoría
+              <p className="text-xs font-bold text-pragmo-green uppercase mb-3 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm">category</span>
+                  Categoría
+                </span>
+                {activeCategory && (
+                  <button onClick={() => setActiveCategory(null)} className="text-[10px] text-pragmo-green hover:text-green-400 font-bold">
+                    Limpiar
+                  </button>
+                )}
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                <button onClick={() => setActiveCategory(null)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${!activeCategory ? 'bg-pragmo-green text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>Todas</button>
+              <div className="flex flex-wrap gap-2">
                 {categories.map(c => (
-                  <button key={c} onClick={() => setActiveCategory(c)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${activeCategory === c ? 'bg-pragmo-green text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>{c}</button>
+                  <button 
+                    key={c} 
+                    onClick={() => setActiveCategory(activeCategory === c ? null : c)} 
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all ${
+                      activeCategory === c 
+                        ? 'bg-pragmo-green text-white' 
+                        : 'bg-slate-700 text-slate-300 active:bg-slate-600'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      {activeCategory === c ? 'check_circle' : 'add_circle'}
+                    </span>
+                    {c}
+                  </button>
                 ))}
               </div>
             </div>
             
             {/* Filtro por Formato */}
             <div className="bg-slate-800 rounded-2xl p-4">
-              <p className="text-xs font-bold text-orange-400 uppercase mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm">description</span>
-                Tipo de Archivo
+              <p className="text-xs font-bold text-orange-400 uppercase mb-3 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm">description</span>
+                  Tipo de Archivo
+                </span>
+                {activeFormat && (
+                  <button onClick={() => setActiveFormat(null)} className="text-[10px] text-orange-400 hover:text-orange-300 font-bold">
+                    Limpiar
+                  </button>
+                )}
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                <button onClick={() => setActiveFormat(null)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${!activeFormat ? 'bg-orange-500 text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>Todos</button>
+              <div className="flex flex-wrap gap-2">
                 {formats.map(f => (
-                  <button key={f} onClick={() => setActiveFormat(f)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${activeFormat === f ? 'bg-orange-500 text-white' : 'bg-slate-700 text-slate-300 active:bg-slate-600'}`}>{f}</button>
+                  <button 
+                    key={f} 
+                    onClick={() => setActiveFormat(activeFormat === f ? null : f)} 
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all ${
+                      activeFormat === f 
+                        ? 'bg-orange-500 text-white' 
+                        : 'bg-slate-700 text-slate-300 active:bg-slate-600'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      {activeFormat === f ? 'check_circle' : 'add_circle'}
+                    </span>
+                    <span className="material-symbols-outlined text-[14px]">
+                      {f.includes('EXCEL') || f.includes('XLS') ? 'table_chart' : 
+                       f.includes('WORD') || f.includes('DOC') ? 'article' : 
+                       f.includes('PDF') ? 'picture_as_pdf' : 
+                       f.includes('PPT') || f.includes('POWER') ? 'slideshow' : 'description'}
+                    </span>
+                    {f}
+                  </button>
                 ))}
               </div>
             </div>
@@ -534,20 +597,28 @@ const AppContent: React.FC = () => {
             {/* Filtros laterales con lectura dinámica de categorías del Excel */}
             <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-8">
               <div>
-                <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-5">Sectores</h4>
-                <div className="flex flex-col gap-2">
-                  <button
-                    onClick={() => setActiveSector(null)}
-                    className={`text-left px-4 py-3 rounded-xl text-xs font-bold transition-all ${!activeSector ? 'bg-pragmo-blue text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}
-                  >
-                    Todos los Sectores
-                  </button>
+                <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-5 flex items-center justify-between">
+                  <span>Sectores</span>
+                  {activeSector && (
+                    <button onClick={() => setActiveSector(null)} className="text-[9px] text-pragmo-blue hover:text-pragmo-cyan font-bold">
+                      Limpiar
+                    </button>
+                  )}
+                </h4>
+                <div className="flex flex-wrap gap-2">
                   {sectors.map(s => (
                     <button
                       key={s}
-                      onClick={() => setActiveSector(s)}
-                      className={`text-left px-4 py-3 rounded-xl text-xs font-bold transition-all ${activeSector === s ? 'bg-pragmo-blue text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}
+                      onClick={() => setActiveSector(activeSector === s ? null : s)}
+                      className={`group flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all ${
+                        activeSector === s 
+                          ? 'bg-pragmo-cyan text-slate-900 shadow-md' 
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
                     >
+                      <span className="material-symbols-outlined text-[16px]">
+                        {activeSector === s ? 'check_circle' : 'add_circle'}
+                      </span>
                       {s}
                     </button>
                   ))}
@@ -555,20 +626,28 @@ const AppContent: React.FC = () => {
               </div>
 
               <div>
-                <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-5">Categorías</h4>
-                <div className="flex flex-col gap-2">
-                  <button
-                    onClick={() => setActiveCategory(null)}
-                    className={`text-left px-4 py-3 rounded-xl text-xs font-bold transition-all ${!activeCategory ? 'bg-pragmo-green text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}
-                  >
-                    Todas las Categorías
-                  </button>
+                <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-5 flex items-center justify-between">
+                  <span>Categorías</span>
+                  {activeCategory && (
+                    <button onClick={() => setActiveCategory(null)} className="text-[9px] text-pragmo-green hover:text-green-600 font-bold">
+                      Limpiar
+                    </button>
+                  )}
+                </h4>
+                <div className="flex flex-wrap gap-2">
                   {categories.map(c => (
                     <button
                       key={c}
-                      onClick={() => setActiveCategory(c)}
-                      className={`text-left px-4 py-3 rounded-xl text-xs font-bold transition-all ${activeCategory === c ? 'bg-pragmo-green text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}
+                      onClick={() => setActiveCategory(activeCategory === c ? null : c)}
+                      className={`group flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all ${
+                        activeCategory === c 
+                          ? 'bg-pragmo-green text-white shadow-md' 
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
                     >
+                      <span className="material-symbols-outlined text-[16px]">
+                        {activeCategory === c ? 'check_circle' : 'add_circle'}
+                      </span>
                       {c}
                     </button>
                   ))}
@@ -576,21 +655,29 @@ const AppContent: React.FC = () => {
               </div>
 
               <div>
-                <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-5">Tipo de Archivo</h4>
-                <div className="flex flex-col gap-2">
-                  <button
-                    onClick={() => setActiveFormat(null)}
-                    className={`text-left px-4 py-3 rounded-xl text-xs font-bold transition-all ${!activeFormat ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}
-                  >
-                    Todos los Formatos
-                  </button>
+                <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-5 flex items-center justify-between">
+                  <span>Tipo de Archivo</span>
+                  {activeFormat && (
+                    <button onClick={() => setActiveFormat(null)} className="text-[9px] text-orange-500 hover:text-orange-600 font-bold">
+                      Limpiar
+                    </button>
+                  )}
+                </h4>
+                <div className="flex flex-wrap gap-2">
                   {formats.map(f => (
                     <button
                       key={f}
-                      onClick={() => setActiveFormat(f)}
-                      className={`text-left px-4 py-3 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${activeFormat === f ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}
+                      onClick={() => setActiveFormat(activeFormat === f ? null : f)}
+                      className={`group flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all ${
+                        activeFormat === f 
+                          ? 'bg-orange-500 text-white shadow-md' 
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
                     >
-                      <span className="material-symbols-outlined text-sm">
+                      <span className="material-symbols-outlined text-[16px]">
+                        {activeFormat === f ? 'check_circle' : 'add_circle'}
+                      </span>
+                      <span className="material-symbols-outlined text-[14px]">
                         {f.includes('EXCEL') || f.includes('XLS') ? 'table_chart' : 
                          f.includes('WORD') || f.includes('DOC') ? 'article' : 
                          f.includes('PDF') ? 'picture_as_pdf' : 
