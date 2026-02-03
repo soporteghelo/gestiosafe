@@ -287,20 +287,20 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     
     addLog('💾 Datos guardados en localStorage, sessionStorage y cookie');
 
-    // La URL de retorno - SIEMPRE usar https://gestiosafe.com (sin www) para consistencia
+    // La URL de retorno - SIEMPRE usar https://www.gestiosafe.com para consistencia
     // Esto asegura que localStorage/sessionStorage funcionen correctamente
     let backUrl: string;
     
     const currentHost = window.location.hostname;
     if (currentHost.includes('gestiosafe.com')) {
-      // En producción, siempre usar el dominio sin www para consistencia
-      backUrl = 'https://gestiosafe.com';
+      // En producción, siempre usar el dominio con www para consistencia
+      backUrl = 'https://www.gestiosafe.com';
     } else if (currentHost === 'localhost' || currentHost.startsWith('192.168') || currentHost.startsWith('127.')) {
       // En desarrollo local, usar la URL de producción para el retorno
-      backUrl = 'https://gestiosafe.com';
+      backUrl = 'https://www.gestiosafe.com';
     } else {
       // Fallback
-      backUrl = 'https://gestiosafe.com';
+      backUrl = 'https://www.gestiosafe.com';
     }
     
     addLog(`🔗 Back URL (normalizada): ${backUrl}`);
