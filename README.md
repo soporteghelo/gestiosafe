@@ -1,15 +1,31 @@
-# GESTIOSAFE - E-Commerce de Plantillas Digitales
+# 🚀 GESTIOSAFE - E-Commerce de Plantillas Digitales SST
 
-Plataforma de venta de plantillas digitales SST con integración de Mercado Pago.
-
-## 🌐 Sitio Web
-**https://www.gestiosafe.com**
+**GESTIOSAFE** es una plataforma web moderna para la venta y descarga de plantillas digitales de Seguridad y Salud en el Trabajo (SST), dirigida a empresas y profesionales que buscan soluciones listas para usar en gestión documental, reportes, matrices y formatos legales.
 
 ---
 
-## 📁 Estructura del Proyecto
+## 🛒 Funcionalidades Principales
 
-```
+| Característica                | Descripción                                                                 |
+|-------------------------------|-----------------------------------------------------------------------------|
+| Compra y descarga inmediata   | Plantillas premium (Excel, Word, PDF, PPT)                                  |
+| Pagos 100% seguros            | Integración Mercado Pago Checkout Pro                                       |
+| Catálogo filtrable            | Por sector, categoría y tipo de archivo                                     |
+| Links de descarga protegidos  | Solo disponibles tras pago verificado                                       |
+| Diseño responsive             | Experiencia optimizada en móvil y desktop                                   |
+| Backend serverless            | Google Apps Script + Google Sheets                                          |
+| Despliegue automático         | Vercel conectado a GitHub                                                   |
+
+---
+
+## 🌐 Sitio Web
+**[www.gestiosafe.com](https://www.gestiosafe.com)**
+
+---
+
+## 🗂️ Estructura del Proyecto
+
+```text
 GESTIOSAFE/
 ├── components/           # Componentes React
 │   ├── CheckoutModal.tsx    # Modal de checkout con Mercado Pago
@@ -52,21 +68,6 @@ VITE_MERCADOPAGO_PUBLIC_KEY=APP_USR-xxxxxxxx
 
 ---
 
-## 🚀 Desarrollo Local
-
-```bash
-# Instalar dependencias
-npm install
-
-# Iniciar servidor de desarrollo
-npm run dev
-
-# Construir para producción
-npm run build
-```
-
----
-
 ## 💳 Flujo de Pago
 
 1. Usuario agrega productos al carrito
@@ -88,16 +89,84 @@ El Apps Script usa un Spreadsheet con estas hojas:
 
 ## 🔧 Tecnologías
 
-- React 19 + TypeScript
-- Vite
-- Tailwind CSS
-- Mercado Pago Checkout Pro
-- Google Apps Script
-- Vercel (hosting)
+| Tecnología                | Uso Principal                        |
+|---------------------------|--------------------------------------|
+| React 19 + TypeScript     | Frontend                             |
+| Vite                      | Bundler y servidor de desarrollo     |
+| Tailwind CSS              | Estilos y diseño                     |
+| Mercado Pago Checkout Pro | Pagos online                         |
+| Google Apps Script        | Backend serverless                   |
+| Google Sheets             | Base de datos                        |
+| Vercel                    | Hosting y despliegue automático      |
+| GitHub                    | Control de versiones                 |
+
+---
+
+## 🌐 Dominio y Configuración
+
+Este proyecto utiliza el dominio personalizado **gestiosafe.com** comprado en [GoDaddy.com](https://www.godaddy.com) con la cuenta:
+- **Email:** sergiolozanogarcia1@gmail.com
+- **Contraseña:** Logan2025$
+
+### Pasos para la configuración del dominio en GoDaddy:
+1. **Compra del dominio:**
+   - Se adquirió el dominio gestiosafe.com desde la cuenta indicada en GoDaddy.
+2. **Acceso a la gestión de DNS:**
+   - Ingresar a GoDaddy y seleccionar el dominio comprado.
+   - Ir a la sección "Administrar DNS".
+3. **Configuración de registros para Vercel:**
+   - En Vercel, agregar el dominio gestiosafe.com al proyecto.
+   - Copiar los registros DNS que Vercel indica (tipo A y CNAME).
+   - En GoDaddy, crear/editar los registros:
+     - **A**: Apuntar a la IP de Vercel (por ejemplo, 76.76.21.21)
+     - **CNAME**: Apuntar a cname.vercel-dns.com
+4. **Propagación:**
+   - Esperar hasta 24 horas para que los cambios de DNS se propaguen globalmente.
+5. **Verificación en Vercel:**
+   - Vercel detecta automáticamente el dominio y activa el certificado SSL (https).
+6. **Pruebas finales:**
+   - Acceder a https://www.gestiosafe.com y verificar que la web carga correctamente y el candado de seguridad aparece.
+
+---
+
+## 🔗 Conexión Vercel + GitHub
+
+El despliegue automático está configurado en [Vercel](https://vercel.com) y conectado al repositorio de GitHub:
+- **Cuenta GitHub:** soporte.ghelo@gmail.com
+- Cada push a `main` en GitHub actualiza la web en Vercel automáticamente.
 
 ---
 
 ## 📞 Soporte
 
-WhatsApp: +51 983 113 140
+- WhatsApp: [+51 983 113 140](https://api.whatsapp.com/send/?phone=51983113140&text=Quiero+informaci%C3%B3n+sobre+Gestiosafe)
+- Email: app@loganqehs.com
+
+---
+
+## 📝 Licencia
+
+MIT
+
+---
+
+## 💰 Análisis de Costo y Precio de Venta
+
+| Modalidad                | Precio estimado (USD)         |
+|--------------------------|-------------------------------|
+| Desarrollo personalizado | $2,000 - $4,000               |
+| Plataforma lista (one-off)| $1,200 - $2,000               |
+| Licencia anual (SaaS)    | $300 - $600 / año              |
+| SaaS mensual             | $40 - $80 / mes                |
+
+**Factores que influyen:**
+- Calidad visual y experiencia de usuario
+- Seguridad y pagos reales
+- Backend serverless (sin servidores propios)
+- Dominio y hosting incluidos
+- Soporte y mantenimiento
+
+**Precio recomendado:**
+- Venta única: $1,500 - $2,500 USD (instalación y dominio incluidos)
+- SaaS mensual: $40 - $80 USD/mes (con soporte y actualizaciones)
 
