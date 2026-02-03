@@ -42,11 +42,25 @@ const TemplateCard: React.FC<TemplateCardProps> = ({ template, onSelect }) => {
 
       {/* Cuerpo de la Tarjeta */}
       <div className="p-2.5 lg:p-6 flex flex-col flex-1">
-        {/* Sector badge */}
-        <div className="mb-1.5 lg:mb-4">
-          <span className="bg-pragmo-blue/10 text-pragmo-blue font-bold text-[7px] lg:text-[9px] uppercase tracking-wider px-1.5 lg:px-2.5 py-0.5 lg:py-1 rounded border border-pragmo-blue/10 line-clamp-1">
+        {/* Etiquetas: Sector, Categoría y Tipo de Archivo */}
+        <div className="mb-1.5 lg:mb-3 flex flex-wrap gap-1 lg:gap-1.5">
+          {/* Sector */}
+          <span className="bg-pragmo-blue/10 text-pragmo-blue font-bold text-[7px] lg:text-[9px] uppercase tracking-wider px-1.5 lg:px-2 py-0.5 rounded flex items-center gap-0.5">
+            <span className="material-symbols-outlined text-[10px] lg:text-xs hidden sm:inline">business</span>
             {template.sector}
           </span>
+          {/* Categoría */}
+          <span className="bg-pragmo-green/10 text-pragmo-green font-bold text-[7px] lg:text-[9px] uppercase tracking-wider px-1.5 lg:px-2 py-0.5 rounded flex items-center gap-0.5">
+            <span className="material-symbols-outlined text-[10px] lg:text-xs hidden sm:inline">category</span>
+            {template.category}
+          </span>
+          {/* Tipo de Archivo */}
+          {template.fileType && template.fileType.length > 0 && (
+            <span className="bg-orange-100 text-orange-600 font-bold text-[7px] lg:text-[9px] uppercase tracking-wider px-1.5 lg:px-2 py-0.5 rounded flex items-center gap-0.5">
+              <span className="material-symbols-outlined text-[10px] lg:text-xs hidden sm:inline">description</span>
+              {Array.isArray(template.fileType) ? template.fileType.join(', ') : template.fileType}
+            </span>
+          )}
         </div>
         
         {/* Título */}

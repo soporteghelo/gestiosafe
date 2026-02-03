@@ -78,8 +78,20 @@ const TemplateDetailsDrawer: React.FC<{
           </div>
           <div className="space-y-3 lg:space-y-4">
             <div className="flex gap-2 flex-wrap">
-              <span className="bg-pragmo-green/10 text-pragmo-green text-[9px] lg:text-[10px] font-bold px-2 lg:px-3 py-1 rounded-lg uppercase">{template.sector}</span>
-              <span className="bg-slate-100 text-slate-500 text-[9px] lg:text-[10px] font-bold px-2 lg:px-3 py-1 rounded-lg uppercase">{template.category}</span>
+              <span className="bg-pragmo-blue/10 text-pragmo-blue text-[9px] lg:text-[10px] font-bold px-2 lg:px-3 py-1 rounded-lg uppercase flex items-center gap-1">
+                <span className="material-symbols-outlined text-xs">business</span>
+                {template.sector}
+              </span>
+              <span className="bg-pragmo-green/10 text-pragmo-green text-[9px] lg:text-[10px] font-bold px-2 lg:px-3 py-1 rounded-lg uppercase flex items-center gap-1">
+                <span className="material-symbols-outlined text-xs">category</span>
+                {template.category}
+              </span>
+              {template.fileType && template.fileType.length > 0 && (
+                <span className="bg-orange-100 text-orange-600 text-[9px] lg:text-[10px] font-bold px-2 lg:px-3 py-1 rounded-lg uppercase flex items-center gap-1">
+                  <span className="material-symbols-outlined text-xs">description</span>
+                  {Array.isArray(template.fileType) ? template.fileType.join(', ') : template.fileType}
+                </span>
+              )}
             </div>
             <h1 className="text-lg lg:text-3xl font-black text-slate-900 leading-tight">{template.name}</h1>
             <p className="text-slate-500 text-xs lg:text-sm leading-relaxed">{template.description}</p>
@@ -790,8 +802,8 @@ const AppContent: React.FC = () => {
             <div className="space-y-4">
               <h4 className="text-white font-bold uppercase tracking-wider text-sm">Sectores</h4>
               <ul className="space-y-3">
-                <li><button onClick={() => { setActiveSector('Construcción'); scrollTo('catalog'); }} className="text-slate-400 hover:text-pragmo-cyan transition-colors text-sm">Construcción</button></li>
-                <li><button onClick={() => { setActiveSector('Minería'); scrollTo('catalog'); }} className="text-slate-400 hover:text-pragmo-cyan transition-colors text-sm">Minería</button></li>
+                <li><button onClick={() => { setActiveSector('Construccion'); scrollTo('catalog'); }} className="text-slate-400 hover:text-pragmo-cyan transition-colors text-sm">Construcción</button></li>
+                <li><button onClick={() => { setActiveSector('Mineria'); scrollTo('catalog'); }} className="text-slate-400 hover:text-pragmo-cyan transition-colors text-sm">Minería</button></li>
                 <li><button onClick={() => { setActiveSector('Manufactura'); scrollTo('catalog'); }} className="text-slate-400 hover:text-pragmo-cyan transition-colors text-sm">Manufactura</button></li>
                 <li><button onClick={() => { setActiveSector('Transporte'); scrollTo('catalog'); }} className="text-slate-400 hover:text-pragmo-cyan transition-colors text-sm">Transporte</button></li>
               </ul>
@@ -832,15 +844,15 @@ const AppContent: React.FC = () => {
           {/* Línea divisora */}
           <div className="border-t border-slate-700/50 pt-8">
             {/* PRAGMO es marca de LOGAN */}
-            <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-6">
-              <span className="text-slate-500 text-sm">GESTIOSAFE es un producto de</span>
-              <a href="https://www.pragmo.pe" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
-                <img src="https://www.pragmo.pe/imagenes/logan-qehs-consultores-s-a-c-logo-15102025175641.png" alt="PRAGMO" className="h-8 object-contain" />
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-8">
+              <span className="text-slate-400 text-sm font-medium">GESTIOSAFE es un producto de</span>
+              <a href="https://www.pragmo.pe" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl transition-all hover:scale-105">
+                <img src="https://www.pragmo.pe/imagenes/logan-qehs-consultores-s-a-c-logo-15102025175641.png" alt="PRAGMO" className="h-10 object-contain" />
               </a>
-              <span className="text-slate-600 text-sm hidden lg:inline">|</span>
-              <span className="text-slate-500 text-sm">PRAGMO es una marca de</span>
-              <a href="https://www.loganqehs.com" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
-                <img src="https://www.loganqehs.com/imagenes/logan-qehs-logo-05102023094955.png" alt="LOGAN QEHS" className="h-8 object-contain" />
+              <span className="text-slate-500 text-lg hidden lg:inline">|</span>
+              <span className="text-slate-400 text-sm font-medium">PRAGMO es una marca de</span>
+              <a href="https://www.loganqehs.com" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl transition-all hover:scale-105">
+                <img src="https://www.loganqehs.com/imagenes/logan-qehs-logo-05102023094955.png" alt="LOGAN QEHS" className="h-10 object-contain" />
               </a>
             </div>
           </div>
