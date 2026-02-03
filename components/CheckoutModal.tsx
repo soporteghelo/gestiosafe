@@ -456,76 +456,78 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
         </div>
       ) : (
         // Step 1 y 3: Layout normal con sidebar
-        <div className="bg-white w-full max-w-6xl rounded-[3rem] overflow-hidden flex flex-col md:flex-row shadow-2xl animate-in zoom-in duration-300" style={{ maxHeight: '95vh' }}>
-          <div className="flex-1 p-8 lg:p-10 overflow-y-auto">
-          <div className="flex justify-between items-center mb-10">
-            <h2 className="text-4xl font-black text-slate-900 tracking-tight">Checkout</h2>
-            <button onClick={onClose} className="size-10 hover:bg-slate-100 rounded-full flex items-center justify-center transition-colors">
-              <span className="material-symbols-outlined text-2xl">close</span>
+        <div className="bg-white w-full max-w-6xl rounded-2xl lg:rounded-[3rem] overflow-hidden flex flex-col lg:flex-row shadow-2xl animate-in zoom-in duration-300 max-h-[95vh] lg:max-h-[90vh]">
+          <div className="flex-1 p-4 lg:p-10 overflow-y-auto">
+          <div className="flex justify-between items-center mb-6 lg:mb-10">
+            <h2 className="text-2xl lg:text-4xl font-black text-slate-900 tracking-tight">Checkout</h2>
+            <button onClick={onClose} className="size-9 lg:size-10 hover:bg-slate-100 rounded-full flex items-center justify-center transition-colors">
+              <span className="material-symbols-outlined text-xl lg:text-2xl">close</span>
             </button>
           </div>
 
           {step === 1 && (
-            <div className="space-y-6 animate-in slide-in-from-left duration-300">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-slate-400 ml-4">Nombres</label>
-                  <input type="text" name="firstName" autoComplete="given-name" placeholder="Escribe tus nombres" className="w-full p-5 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} />
+            <div className="space-y-4 lg:space-y-6 animate-in slide-in-from-left duration-300">
+              <div className="grid grid-cols-2 gap-3 lg:gap-4">
+                <div className="space-y-1 lg:space-y-2">
+                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">Nombres</label>
+                  <input type="text" name="firstName" autoComplete="given-name" placeholder="Nombres" className="w-full p-3 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm lg:text-base font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-slate-400 ml-4">Apellidos</label>
-                  <input type="text" name="lastName" autoComplete="family-name" placeholder="Escribe tus apellidos" className="w-full p-5 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} />
+                <div className="space-y-1 lg:space-y-2">
+                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">Apellidos</label>
+                  <input type="text" name="lastName" autoComplete="family-name" placeholder="Apellidos" className="w-full p-3 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm lg:text-base font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-slate-400 ml-4">Correo Electrónico</label>
-                <input type="email" name="email" autoComplete="email" placeholder="ejemplo@correo.com" className="w-full p-5 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
+              <div className="space-y-1 lg:space-y-2">
+                <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">Correo Electrónico</label>
+                <input type="email" name="email" autoComplete="email" placeholder="ejemplo@correo.com" className="w-full p-3 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm lg:text-base font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-slate-400 ml-4">DNI / RUC</label>
-                <input type="text" name="docNumber" autoComplete="off" placeholder="Número de documento" className="w-full p-5 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.docNumber} onChange={e => setFormData({ ...formData, docNumber: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-slate-400 ml-4">Teléfono</label>
-                <input type="tel" name="phone" autoComplete="tel" placeholder="Número de teléfono" className="w-full p-5 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+              <div className="grid grid-cols-2 gap-3 lg:gap-4">
+                <div className="space-y-1 lg:space-y-2">
+                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">DNI / RUC</label>
+                  <input type="text" name="docNumber" autoComplete="off" placeholder="Documento" className="w-full p-3 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm lg:text-base font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.docNumber} onChange={e => setFormData({ ...formData, docNumber: e.target.value })} />
+                </div>
+                <div className="space-y-1 lg:space-y-2">
+                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">Teléfono</label>
+                  <input type="tel" name="phone" autoComplete="tel" placeholder="Teléfono" className="w-full p-3 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm lg:text-base font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+                </div>
               </div>
 
               {/* SELECCIÓN DE MONEDA */}
-              <div className="space-y-2 pt-4 border-t border-slate-100 mt-4">
-                <label className="text-[10px] font-black uppercase text-slate-400 ml-4">Moneda de Pago</label>
-                <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2 pt-4 border-t border-slate-100 mt-2 lg:mt-4">
+                <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">Moneda de Pago</label>
+                <div className="grid grid-cols-2 gap-2 lg:gap-3">
                   <button
                     type="button"
                     onClick={() => setSelectedCurrency('PEN')}
-                    className={`p-5 rounded-2xl font-bold transition-all flex items-center justify-center gap-3 border-2 ${selectedCurrency === 'PEN' ? 'bg-white border-pragmo-blue text-pragmo-blue shadow-xl shadow-blue-500/10' : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'}`}
+                    className={`p-3 lg:p-5 rounded-xl lg:rounded-2xl font-bold transition-all flex items-center justify-center gap-2 lg:gap-3 border-2 ${selectedCurrency === 'PEN' ? 'bg-white border-pragmo-blue text-pragmo-blue shadow-xl shadow-blue-500/10' : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'}`}
                   >
-                    <span className="text-2xl">🇵🇪</span>
+                    <span className="text-lg lg:text-2xl">🇵🇪</span>
                     <div className="text-left leading-tight">
-                      <p className="text-xs font-black">SOLES</p>
-                      <p className="text-[10px] opacity-75">S/ {(total * EXCHANGE_RATE).toFixed(2)}</p>
+                      <p className="text-[10px] lg:text-xs font-black">SOLES</p>
+                      <p className="text-[9px] lg:text-[10px] opacity-75">S/ {(total * EXCHANGE_RATE).toFixed(2)}</p>
                     </div>
                   </button>
                   <button
                     type="button"
                     onClick={() => setSelectedCurrency('USD')}
-                    className={`p-5 rounded-2xl font-bold transition-all flex items-center justify-center gap-3 border-2 ${selectedCurrency === 'USD' ? 'bg-white border-green-500 text-green-600 shadow-xl shadow-green-500/10' : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'}`}
+                    className={`p-3 lg:p-5 rounded-xl lg:rounded-2xl font-bold transition-all flex items-center justify-center gap-2 lg:gap-3 border-2 ${selectedCurrency === 'USD' ? 'bg-white border-green-500 text-green-600 shadow-xl shadow-green-500/10' : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'}`}
                   >
-                    <span className="text-2xl">🇺🇸</span>
+                    <span className="text-lg lg:text-2xl">🇺🇸</span>
                     <div className="text-left leading-tight">
-                      <p className="text-xs font-black">DÓLARES</p>
-                      <p className="text-[10px] opacity-75">$ {total.toFixed(2)}</p>
+                      <p className="text-[10px] lg:text-xs font-black">USD</p>
+                      <p className="text-[9px] lg:text-[10px] opacity-75">$ {total.toFixed(2)}</p>
                     </div>
                   </button>
                 </div>
               </div>
 
-              <button onClick={handleContinue} disabled={loadingToken || !formData.email || !formData.firstName} className="w-full py-6 bg-pragmo-blue hover:bg-blue-800 text-white font-black rounded-3xl shadow-xl shadow-blue-500/20 disabled:opacity-50 transition-all active:scale-95 flex items-center justify-center gap-3 text-lg mt-8">
+              <button onClick={handleContinue} disabled={loadingToken || !formData.email || !formData.firstName} className="w-full py-4 lg:py-6 bg-pragmo-blue hover:bg-blue-800 text-white font-black rounded-xl lg:rounded-3xl shadow-xl shadow-blue-500/20 disabled:opacity-50 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm lg:text-lg mt-4 lg:mt-8">
                 {loadingToken ? (
-                  <div className="size-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="size-5 lg:size-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <>
-                    Continuar al Pago ({getCurrencySymbol()} {getFinalTotal().toFixed(2)})
-                    {DISCOUNT_PERCENT > 0 && <span className="ml-2 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full">-{DISCOUNT_PERCENT}%</span>}
+                    Pagar {getCurrencySymbol()} {getFinalTotal().toFixed(2)}
+                    {DISCOUNT_PERCENT > 0 && <span className="ml-1 bg-yellow-400 text-yellow-900 text-[10px] lg:text-xs px-2 py-0.5 rounded-full">-{DISCOUNT_PERCENT}%</span>}
                   </>
                 )}
               </button>

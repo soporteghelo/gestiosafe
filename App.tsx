@@ -243,12 +243,12 @@ const AppContent: React.FC = () => {
         </div>
       )}
 
-      <nav className="h-20 bg-background-dark/95 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 lg:px-20 sticky top-0 z-[100]">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <div className="size-9 lg:size-10 bg-pragmo-cyan rounded-xl flex items-center justify-center text-background-dark shadow-lg">
-            <span className="material-symbols-outlined font-bold">verified_user</span>
+      <nav className="h-16 lg:h-20 bg-background-dark/95 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 lg:px-20 sticky top-0 z-[100]">
+        <div className="flex items-center gap-2 lg:gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div className="size-8 lg:size-10 bg-pragmo-cyan rounded-lg lg:rounded-xl flex items-center justify-center text-background-dark shadow-lg">
+            <span className="material-symbols-outlined font-bold text-lg lg:text-2xl">verified_user</span>
           </div>
-          <h1 className="text-white text-lg lg:text-xl font-extrabold tracking-tighter">Gestiosafe</h1>
+          <h1 className="text-white text-base lg:text-xl font-extrabold tracking-tighter">Gestiosafe</h1>
         </div>
 
         <div className="hidden lg:flex items-center gap-8">
@@ -256,52 +256,91 @@ const AppContent: React.FC = () => {
           <button onClick={() => scrollTo('catalog')} className="text-[11px] font-bold text-slate-300 hover:text-white uppercase tracking-widest transition-colors">Sectores</button>
         </div>
 
-        <div className="flex items-center gap-2 lg:gap-4">
+        <div className="flex items-center gap-1 lg:gap-4">
           {/* Botón Historial de Compras */}
           <button 
             onClick={() => setIsHistoryOpen(true)} 
-            className="relative p-2.5 text-slate-300 hover:bg-white/5 rounded-xl transition-all"
+            className="relative p-2 lg:p-2.5 text-slate-300 hover:bg-white/5 rounded-lg lg:rounded-xl transition-all"
             title="Mis Compras"
           >
-            <span className="material-symbols-outlined text-2xl">receipt_long</span>
+            <span className="material-symbols-outlined text-xl lg:text-2xl">receipt_long</span>
           </button>
           {/* Botón Carrito */}
-          <button onClick={() => itemCount > 0 && setIsCheckoutOpen(true)} className="relative p-2.5 text-slate-300 hover:bg-white/5 rounded-xl transition-all">
-            <span className="material-symbols-outlined text-2xl">shopping_cart</span>
-            {itemCount > 0 && <span className="absolute top-1 right-1 size-5 bg-pragmo-cyan text-background-dark text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-background-dark">{itemCount}</span>}
+          <button onClick={() => itemCount > 0 && setIsCheckoutOpen(true)} className="relative p-2 lg:p-2.5 text-slate-300 hover:bg-white/5 rounded-lg lg:rounded-xl transition-all">
+            <span className="material-symbols-outlined text-xl lg:text-2xl">shopping_cart</span>
+            {itemCount > 0 && <span className="absolute top-0.5 right-0.5 lg:top-1 lg:right-1 size-4 lg:size-5 bg-pragmo-cyan text-background-dark text-[8px] lg:text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-background-dark">{itemCount}</span>}
           </button>
           <button onClick={handleContactWhatsApp} className="px-5 py-2.5 bg-pragmo-blue hover:bg-blue-800 text-white text-[11px] font-bold rounded-xl shadow-lg transition-all hidden sm:block">CONTACTAR</button>
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-2 text-white bg-white/5 rounded-xl">
-            <span className="material-symbols-outlined">{isMobileMenuOpen ? 'close' : 'menu'}</span>
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-2 text-white bg-white/5 rounded-lg">
+            <span className="material-symbols-outlined text-xl">{isMobileMenuOpen ? 'close' : 'menu'}</span>
           </button>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <header className="bg-background-dark pt-12 lg:pt-24 pb-20 lg:pb-32 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-pragmo-cyan/10 to-transparent"></div>
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-20 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center relative z-10">
-          <div className="space-y-6 lg:space-y-8 text-center lg:text-left">
-            <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-white/5 rounded-full border border-white/10">
-              <span className="size-2 bg-pragmo-cyan rounded-full animate-pulse"></span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-300">NUEVO CATÁLOGO 2024</span>
-            </div>
-            <h1 className="text-4xl lg:text-7xl font-black text-white leading-tight tracking-tight">
-              Digitaliza tu <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-500">Seguridad Laboral</span> <br className="hidden lg:block" />
-              con Plantillas Expertas
-            </h1>
-            <p className="text-slate-400 text-base lg:text-xl max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Optimiza tus auditorías y asegura el cumplimiento normativo con documentos listos para usar, diseñados por especialistas en prevención.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <button onClick={() => scrollTo('catalog')} className="px-8 lg:px-10 py-4 lg:py-5 bg-pragmo-cyan hover:bg-cyan-500 text-background-dark font-black rounded-2xl shadow-xl shadow-cyan-500/20 transition-all flex items-center justify-center gap-3">
-                Ver Catálogo
-                <span className="material-symbols-outlined">arrow_forward</span>
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-[99] bg-background-dark/98 backdrop-blur-lg pt-20">
+          <div className="p-6 space-y-6">
+            <div className="space-y-2">
+              <button onClick={() => { scrollTo('catalog'); setIsMobileMenuOpen(false); }} className="w-full text-left px-4 py-4 text-white font-bold rounded-xl bg-white/5 flex items-center gap-3">
+                <span className="material-symbols-outlined">grid_view</span>
+                Ver Plantillas
               </button>
-              <button onClick={() => showToast("Video demo próximamente")} className="px-8 lg:px-10 py-4 lg:py-5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-3">
-                <span className="material-symbols-outlined">play_circle</span>
-                Demo Video
+              <button onClick={() => { handleContactWhatsApp(); setIsMobileMenuOpen(false); }} className="w-full text-left px-4 py-4 text-white font-bold rounded-xl bg-white/5 flex items-center gap-3">
+                <span className="material-symbols-outlined">chat</span>
+                Contactar por WhatsApp
+              </button>
+            </div>
+            
+            {/* Filtros Móviles */}
+            <div className="bg-white/5 rounded-2xl p-4">
+              <p className="text-xs font-bold text-slate-400 uppercase mb-3">Filtrar por Sector</p>
+              <div className="flex flex-wrap gap-2">
+                <button onClick={() => { setActiveSector(null); setIsMobileMenuOpen(false); }} className={`px-3 py-2 rounded-lg text-xs font-bold ${!activeSector ? 'bg-pragmo-cyan text-background-dark' : 'bg-white/10 text-white'}`}>Todos</button>
+                {sectors.map(s => (
+                  <button key={s} onClick={() => { setActiveSector(s); setIsMobileMenuOpen(false); }} className={`px-3 py-2 rounded-lg text-xs font-bold ${activeSector === s ? 'bg-pragmo-cyan text-background-dark' : 'bg-white/10 text-white'}`}>{s}</button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="bg-white/5 rounded-2xl p-4">
+              <p className="text-xs font-bold text-slate-400 uppercase mb-3">Filtrar por Categoría</p>
+              <div className="flex flex-wrap gap-2">
+                <button onClick={() => { setActiveCategory(null); setIsMobileMenuOpen(false); }} className={`px-3 py-2 rounded-lg text-xs font-bold ${!activeCategory ? 'bg-pragmo-green text-white' : 'bg-white/10 text-white'}`}>Todas</button>
+                {categories.map(c => (
+                  <button key={c} onClick={() => { setActiveCategory(c); setIsMobileMenuOpen(false); }} className={`px-3 py-2 rounded-lg text-xs font-bold ${activeCategory === c ? 'bg-pragmo-green text-white' : 'bg-white/10 text-white'}`}>{c}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hero Section */}
+      <header className="bg-background-dark pt-8 lg:pt-24 pb-12 lg:pb-32 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-pragmo-cyan/10 to-transparent"></div>
+        <div className="max-w-[1440px] mx-auto px-4 lg:px-20 grid lg:grid-cols-2 gap-8 lg:gap-16 items-center relative z-10">
+          <div className="space-y-4 lg:space-y-8 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
+              <span className="size-1.5 bg-pragmo-cyan rounded-full animate-pulse"></span>
+              <span className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-slate-300">NUEVO CATÁLOGO 2024</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl lg:text-7xl font-black text-white leading-tight tracking-tight">
+              Digitaliza tu{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-500">Seguridad Laboral</span>
+              <span className="hidden lg:inline"><br />con Plantillas Expertas</span>
+            </h1>
+            <p className="text-slate-400 text-sm lg:text-xl max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Documentos listos para usar, diseñados por especialistas en prevención.
+            </p>
+            <div className="flex flex-row gap-3 justify-center lg:justify-start">
+              <button onClick={() => scrollTo('catalog')} className="flex-1 sm:flex-none px-6 lg:px-10 py-3 lg:py-5 bg-pragmo-cyan hover:bg-cyan-500 text-background-dark text-sm lg:text-base font-black rounded-xl lg:rounded-2xl shadow-xl shadow-cyan-500/20 transition-all flex items-center justify-center gap-2">
+                Ver Catálogo
+                <span className="material-symbols-outlined text-lg lg:text-2xl">arrow_forward</span>
+              </button>
+              <button onClick={handleContactWhatsApp} className="sm:hidden flex-1 px-6 py-3 bg-pragmo-blue text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-lg">chat</span>
+                WhatsApp
               </button>
             </div>
           </div>
@@ -315,7 +354,42 @@ const AppContent: React.FC = () => {
         </div>
       </header>
 
-      <section id="catalog" className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-12 p-4 lg:p-12 max-w-[1920px] mx-auto w-full relative">
+      <section id="catalog" className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-12 p-3 lg:p-12 max-w-[1920px] mx-auto w-full relative">
+        {/* Barra de búsqueda y filtros móviles */}
+        <div className="lg:hidden space-y-3 mb-2">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Buscar plantilla..."
+              className="flex-1 px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pragmo-blue text-sm font-medium"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="px-4 py-3 bg-pragmo-blue text-white rounded-xl flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-lg">tune</span>
+            </button>
+          </div>
+          {(activeSector || activeCategory) && (
+            <div className="flex flex-wrap gap-2">
+              {activeSector && (
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-pragmo-blue/10 text-pragmo-blue text-xs font-bold rounded-lg">
+                  {activeSector}
+                  <button onClick={() => setActiveSector(null)} className="ml-1">×</button>
+                </span>
+              )}
+              {activeCategory && (
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-pragmo-green/10 text-pragmo-green text-xs font-bold rounded-lg">
+                  {activeCategory}
+                  <button onClick={() => setActiveCategory(null)} className="ml-1">×</button>
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+        
         <aside className="hidden lg:block w-[320px] shrink-0">
           <div className="sticky top-28 space-y-6">
             <div className="bg-slate-200/50 backdrop-blur-md p-6 rounded-[2rem] border border-slate-300/30">
@@ -376,17 +450,17 @@ const AppContent: React.FC = () => {
           </div>
         </aside>
 
-        <main className="flex-1 space-y-8">
-          <div className="bg-white p-5 lg:p-6 lg:px-10 rounded-[2rem] lg:rounded-[2.5rem] shadow-sm border border-slate-100 flex items-center justify-between">
-            <p className="text-xs lg:text-sm font-bold text-slate-400">Resultados: <span className="text-slate-900 font-black">{filteredTemplates.length}</span></p>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="bg-slate-50 border-slate-200 rounded-xl text-xs font-bold py-2.5">
-              <option value="popular">Más Populares</option>
-              <option value="price-low">Menor Inversión</option>
-              <option value="price-high">Mayor Inversión</option>
+        <main className="flex-1 space-y-4 lg:space-y-8">
+          <div className="bg-white p-3 lg:p-6 lg:px-10 rounded-xl lg:rounded-[2.5rem] shadow-sm border border-slate-100 flex items-center justify-between">
+            <p className="text-[11px] lg:text-sm font-bold text-slate-400">Resultados: <span className="text-slate-900 font-black">{filteredTemplates.length}</span></p>
+            <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="bg-slate-50 border-slate-200 rounded-lg lg:rounded-xl text-[11px] lg:text-xs font-bold py-2 lg:py-2.5 px-2">
+              <option value="popular">Populares</option>
+              <option value="price-low">Menor Precio</option>
+              <option value="price-high">Mayor Precio</option>
             </select>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 lg:gap-8">
             {displayedTemplates.map(t => (
               <TemplateCard key={t.id} template={t} onSelect={setSelectedTemplate} />
             ))}
