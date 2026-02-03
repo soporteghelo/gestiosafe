@@ -33,3 +33,8 @@ export const PROMO_MESSAGE = "¡Oferta por tiempo limitado!";
 // ============================================
 export const WHATSAPP_NUMBER = "51983113140";
 
+// ============================================
+// 🖼️ IMAGEN DEL HERO
+// ============================================
+export const HERO_IMAGE_URL = "https://lh3.googleusercontent.com/d/1M0XfIynchG8kaZtlNo-Vffj6PsMsz4-i";
+

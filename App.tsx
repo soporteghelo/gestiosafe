@@ -8,7 +8,7 @@ import TemplateCard from './components/TemplateCard';
 import CheckoutModal from './components/CheckoutModal';
 import PaymentCallback from './components/PaymentCallback';
 import PurchaseHistoryModal from './components/PurchaseHistoryModal';
-import { APPS_SCRIPT_URL, WHATSAPP_NUMBER, DISCOUNT_PERCENT, PROMO_NAME, PROMO_MESSAGE } from './config';
+import { APPS_SCRIPT_URL, WHATSAPP_NUMBER, DISCOUNT_PERCENT, PROMO_NAME, PROMO_MESSAGE, HERO_IMAGE_URL } from './config';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -470,7 +470,7 @@ const AppContent: React.FC = () => {
           <div className="space-y-3 lg:space-y-8 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-2.5 lg:px-3 py-1 bg-white/5 rounded-full border border-white/10">
               <span className="size-1.5 bg-pragmo-cyan rounded-full animate-pulse"></span>
-              <span className="text-[8px] lg:text-[10px] font-bold uppercase tracking-widest text-slate-300">CATÁLOGO 2024</span>
+              <span className="text-[8px] lg:text-[10px] font-bold uppercase tracking-widest text-slate-300">CATÁLOGO 2026</span>
             </div>
             <h1 className="text-xl sm:text-2xl lg:text-7xl font-black text-white leading-tight tracking-tight">
               <span className="lg:hidden">Plantillas SST<br/>Profesionales</span>
@@ -496,7 +496,7 @@ const AppContent: React.FC = () => {
           <div className="relative hidden lg:block">
             <div className="relative z-10 bg-slate-800 p-3 rounded-[2.5rem] shadow-2xl border-4 border-slate-700/50">
               <div className="bg-slate-900 rounded-[2rem] overflow-hidden aspect-[16/11] relative">
-                <img src="https://images.unsplash.com/photo-1557426282-2d8d5942da5b?auto=format&fit=crop&q=80&w=1200" className="w-full h-full object-cover opacity-60" />
+                <img src={HERO_IMAGE_URL} className="w-full h-full object-cover" alt="Plantillas SST Profesionales" />
               </div>
             </div>
           </div>
