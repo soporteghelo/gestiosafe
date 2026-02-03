@@ -117,7 +117,7 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
         payment_id: paymentIdInput.trim(),
         email: formData.email,
         customer_name: `${formData.firstName} ${formData.lastName}`,
-        product_ids: encodeURIComponent(JSON.stringify(productIds))
+        product_ids: JSON.stringify(productIds)
       });
 
       const res = await fetch(`${APPS_SCRIPT_URL}?${query.toString()}`);
@@ -164,7 +164,7 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
         preference_id: mpPreferenceId,
         email: formData.email,
         customer_name: `${formData.firstName} ${formData.lastName}`,
-        product_ids: encodeURIComponent(JSON.stringify(productIds))
+        product_ids: JSON.stringify(productIds)
       });
 
       const res = await fetch(`${APPS_SCRIPT_URL}?${query.toString()}`);

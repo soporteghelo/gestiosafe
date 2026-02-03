@@ -361,13 +361,19 @@ function getDownloadLinksForProducts(productIds) {
     
     const links = [];
     
+    // Convertir todos los productIds a string para comparación consistente
+    const productIdsStr = productIds.map(id => String(id));
+    Logger.log("🔎 Buscando IDs (como strings): " + JSON.stringify(productIdsStr));
+    
     // Buscar cada producto por su ID
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      const productId = row[idIndex]?.toString();
-      const link = row[linkIndex]?.toString();
+      const productId = String(row[idIndex] || '').trim();
+      const link = row[linkIndex]?.toString() || '';
       
-      if (productIds.includes(productId) && link) {
+      Logger.log("  Fila " + i + ": ID='" + productId + "', Link='" + (link ? link.substring(0, 50) + '...' : 'VACIO') + "'");
+      
+      if (productIdsStr.includes(productId) && link) {
         links.push({
           id: productId,
           link: link
@@ -430,12 +436,20 @@ function handleVerifyByPaymentId(p) {
         let downloadLinks = [];
         if (p.product_ids) {
           try {
-            const productIds = JSON.parse(p.product_ids);
-            Logger.log("🔒 Obteniendo links para productos aprobados: " + JSON.stringify(productIds));
+            // Decodificar URL encoding y luego parsear JSON
+            const decodedIds = decodeURIComponent(p.product_ids);
+            Logger.log("🔑 product_ids raw: " + p.product_ids);
+            Logger.log("🔑 product_ids decoded: " + decodedIds);
+            const productIds = JSON.parse(decodedIds);
+            Logger.log("🔒 Obteniendo links para productos: " + JSON.stringify(productIds));
             downloadLinks = getDownloadLinksForProducts(productIds);
+            Logger.log("📦 Links obtenidos: " + JSON.stringify(downloadLinks));
           } catch (e) {
             Logger.log("⚠️ Error parseando product_ids: " + e.toString());
+            Logger.log("⚠️ product_ids recibido: " + p.product_ids);
           }
+        } else {
+          Logger.log("⚠️ No se recibieron product_ids en la verificación");
         }
         
         return jsonResponse({
@@ -506,8 +520,11 @@ function handleVerifyPayment(p) {
         let downloadLinks = [];
         if (p.product_ids) {
           try {
-            const productIds = JSON.parse(p.product_ids);
-            Logger.log("🔒 Obteniendo links para productos aprobados: " + JSON.stringify(productIds));
+            // Decodificar URL encoding y luego parsear JSON
+            const decodedIds = decodeURIComponent(p.product_ids);
+            Logger.log("🔑 product_ids decoded: " + decodedIds);
+            const productIds = JSON.parse(decodedIds);
+            Logger.log("🔒 Obteniendo links para productos: " + JSON.stringify(productIds));
             downloadLinks = getDownloadLinksForProducts(productIds);
           } catch (e) {
             Logger.log("⚠️ Error parseando product_ids: " + e.toString());

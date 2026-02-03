@@ -103,13 +103,14 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
           // Verificar con el backend - SEGURIDAD: enviar IDs de productos
           // El backend verificará el pago y devolverá los links SOLO si está aprobado
           const productIds = cartItems.map((item: any) => item.id).filter(Boolean);
+          console.log('🆔 Product IDs a enviar:', productIds);
           
           const query = new URLSearchParams({
             action: 'VERIFY_BY_PAYMENT_ID',
             payment_id: paymentId,
             email: customer.email,
             customer_name: customer.name,
-            product_ids: encodeURIComponent(JSON.stringify(productIds))
+            product_ids: JSON.stringify(productIds) // Sin doble encoding
           });
 
           const res = await fetch(`${APPS_SCRIPT_URL}?${query.toString()}`);
