@@ -358,88 +358,89 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/80 p-2 backdrop-blur-md">
       {step === 2 ? (
-        // Step 2: Esperando que el usuario complete el pago en MP
-        <div className="bg-white w-full max-w-lg rounded-[3rem] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in duration-300">
-          <div className="p-6 flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-blue-600 to-cyan-500">
-            <div className="flex items-center gap-4">
-              <div className="size-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                <span className="material-symbols-outlined text-white text-2xl">lock</span>
+        // Step 2: Esperando que el usuario complete el pago en MP - Optimizado para móvil
+        <div className="bg-white w-full max-w-lg mx-4 rounded-2xl lg:rounded-[3rem] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in duration-300 max-h-[90vh]">
+          <div className="p-4 lg:p-6 flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-blue-600 to-cyan-500">
+            <div className="flex items-center gap-3">
+              <div className="size-10 lg:size-12 bg-white/20 rounded-xl lg:rounded-2xl flex items-center justify-center">
+                <span className="material-symbols-outlined text-white text-xl lg:text-2xl">lock</span>
               </div>
               <div>
-                <h2 className="text-xl font-black text-white">Pago en Proceso</h2>
-                <p className="text-xs text-white/80 font-medium">Mercado Pago</p>
+                <h2 className="text-base lg:text-xl font-black text-white">Pago en Proceso</h2>
+                <p className="text-[10px] lg:text-xs text-white/80 font-medium">Mercado Pago</p>
               </div>
             </div>
-            <button onClick={() => setStep(1)} className="size-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
-              <span className="material-symbols-outlined text-white">close</span>
+            <button onClick={() => setStep(1)} className="size-9 lg:size-10 bg-white/20 hover:bg-white/30 active:bg-white/40 rounded-full flex items-center justify-center transition-colors">
+              <span className="material-symbols-outlined text-white text-xl">close</span>
             </button>
           </div>
           
-          <div className="p-8 flex flex-col items-center text-center space-y-6">
-            <div className="size-20 bg-blue-100 rounded-full flex items-center justify-center">
-              <span className="material-symbols-outlined text-blue-600 text-4xl animate-pulse">open_in_new</span>
+          <div className="p-5 lg:p-8 flex flex-col items-center text-center space-y-4 lg:space-y-6 overflow-y-auto">
+            <div className="size-14 lg:size-20 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="material-symbols-outlined text-blue-600 text-2xl lg:text-4xl animate-pulse">open_in_new</span>
             </div>
             
             <div>
-              <h3 className="text-2xl font-black text-slate-800 mb-2">Completa tu pago</h3>
-              <p className="text-slate-500">Se abrió una nueva pestaña con el checkout de Mercado Pago.</p>
-              <p className="text-slate-500 mt-1">Completa el pago y regresa aquí.</p>
+              <h3 className="text-lg lg:text-2xl font-black text-slate-800 mb-1 lg:mb-2">Completa tu pago</h3>
+              <p className="text-slate-500 text-xs lg:text-base">Fuiste redirigido a Mercado Pago.</p>
+              <p className="text-slate-500 text-xs lg:text-base">Al terminar, vuelve aquí.</p>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-2xl w-full">
-              <p className="text-xs font-bold text-slate-400 uppercase mb-2">Total a pagar</p>
+            <div className="bg-slate-50 p-3 lg:p-4 rounded-xl w-full">
+              <p className="text-[10px] lg:text-xs font-bold text-slate-400 uppercase mb-1">Total a pagar</p>
               {DISCOUNT_PERCENT > 0 ? (
-                <div className="space-y-1">
-                  <p className="text-lg text-slate-400 line-through">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</p>
-                  <p className="text-3xl font-black text-green-600">{getCurrencySymbol()} {getFinalTotal().toFixed(2)}</p>
-                  <p className="text-xs font-bold text-green-500">¡Ahorraste {getCurrencySymbol()} {getDiscountAmount().toFixed(2)}!</p>
+                <div className="space-y-0.5">
+                  <p className="text-sm lg:text-lg text-slate-400 line-through">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</p>
+                  <p className="text-2xl lg:text-3xl font-black text-green-600">{getCurrencySymbol()} {getFinalTotal().toFixed(2)}</p>
+                  <p className="text-[10px] lg:text-xs font-bold text-green-500">¡Ahorraste {getCurrencySymbol()} {getDiscountAmount().toFixed(2)}!</p>
                 </div>
               ) : (
-                <p className="text-3xl font-black text-slate-900">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</p>
+                <p className="text-2xl lg:text-3xl font-black text-slate-900">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</p>
               )}
             </div>
 
             {/* Campo para número de operación */}
-            <div className="w-full space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase">Número de Operación</label>
+            <div className="w-full space-y-1.5">
+              <label className="text-[10px] lg:text-xs font-bold text-slate-500 uppercase">Número de Operación</label>
               <div className="flex gap-2">
                 <input
                   type="text"
+                  inputMode="numeric"
                   placeholder="Ej: 1344393167"
                   value={paymentIdInput}
                   onChange={(e) => setPaymentIdInput(e.target.value.replace(/\D/g, ''))}
-                  className="flex-1 p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-center text-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
+                  className="flex-1 p-3 lg:p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-center text-base lg:text-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
                 />
               </div>
-              <p className="text-[10px] text-slate-400 text-center">
-                Encuéntralo en la pantalla de confirmación de Mercado Pago (después del #)
+              <p className="text-[9px] lg:text-[10px] text-slate-400 text-center">
+                Encuéntralo en la pantalla de confirmación (después del #)
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 w-full">
+            <div className="flex flex-col gap-2 w-full">
               {mpInitPoint && (
                 <button 
                   onClick={() => window.open(mpInitPoint, '_blank')}
-                  className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl flex items-center justify-center gap-2 transition-all"
+                  className="w-full py-3 lg:py-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-black rounded-xl flex items-center justify-center gap-2 transition-all text-sm lg:text-base"
                 >
-                  <span className="material-symbols-outlined">open_in_new</span>
-                  Abrir checkout de nuevo
+                  <span className="material-symbols-outlined text-lg">open_in_new</span>
+                  Abrir checkout
                 </button>
               )}
               
               <button 
                 onClick={verifyByPaymentId}
                 disabled={verifyingPayment || !paymentIdInput.trim()}
-                className="w-full py-4 bg-green-600 hover:bg-green-700 disabled:bg-green-300 disabled:cursor-not-allowed text-white font-black rounded-2xl flex items-center justify-center gap-2 transition-all"
+                className="w-full py-3 lg:py-4 bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:bg-green-300 disabled:cursor-not-allowed text-white font-black rounded-xl flex items-center justify-center gap-2 transition-all text-sm lg:text-base"
               >
                 {verifyingPayment ? (
                   <>
-                    <div className="size-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Verificando pago...
+                    <div className="size-4 lg:size-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Verificando...
                   </>
                 ) : (
                   <>
-                    <span className="material-symbols-outlined">verified</span>
+                    <span className="material-symbols-outlined text-lg">verified</span>
                     Verificar mi pago
                   </>
                 )}
@@ -447,7 +448,7 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
               
               <button 
                 onClick={() => setStep(1)}
-                className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all"
+                className="w-full py-2.5 lg:py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all text-sm"
               >
                 Cancelar y volver
               </button>
@@ -458,76 +459,91 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
         // Step 1 y 3: Layout normal con sidebar
         <div className="bg-white w-full max-w-6xl rounded-2xl lg:rounded-[3rem] overflow-hidden flex flex-col lg:flex-row shadow-2xl animate-in zoom-in duration-300 max-h-[95vh] lg:max-h-[90vh]">
           <div className="flex-1 p-4 lg:p-10 overflow-y-auto">
-          <div className="flex justify-between items-center mb-6 lg:mb-10">
-            <h2 className="text-2xl lg:text-4xl font-black text-slate-900 tracking-tight">Checkout</h2>
-            <button onClick={onClose} className="size-9 lg:size-10 hover:bg-slate-100 rounded-full flex items-center justify-center transition-colors">
+          <div className="flex justify-between items-center mb-4 lg:mb-10">
+            <h2 className="text-xl lg:text-4xl font-black text-slate-900 tracking-tight">Checkout</h2>
+            <button onClick={onClose} className="size-9 lg:size-10 hover:bg-slate-100 active:bg-slate-200 rounded-full flex items-center justify-center transition-colors">
               <span className="material-symbols-outlined text-xl lg:text-2xl">close</span>
             </button>
           </div>
 
           {step === 1 && (
-            <div className="space-y-4 lg:space-y-6 animate-in slide-in-from-left duration-300">
-              <div className="grid grid-cols-2 gap-3 lg:gap-4">
-                <div className="space-y-1 lg:space-y-2">
-                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">Nombres</label>
-                  <input type="text" name="firstName" autoComplete="given-name" placeholder="Nombres" className="w-full p-3 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm lg:text-base font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} />
+            <div className="space-y-3 lg:space-y-6 animate-in slide-in-from-left duration-300">
+              <div className="grid grid-cols-2 gap-2 lg:gap-4">
+                <div className="space-y-1">
+                  <label className="text-[8px] lg:text-[10px] font-black uppercase text-slate-400 ml-2">Nombres</label>
+                  <input type="text" name="firstName" autoComplete="given-name" placeholder="Nombres" className="w-full p-2.5 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} />
                 </div>
-                <div className="space-y-1 lg:space-y-2">
-                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">Apellidos</label>
-                  <input type="text" name="lastName" autoComplete="family-name" placeholder="Apellidos" className="w-full p-3 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm lg:text-base font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} />
+                <div className="space-y-1">
+                  <label className="text-[8px] lg:text-[10px] font-black uppercase text-slate-400 ml-2">Apellidos</label>
+                  <input type="text" name="lastName" autoComplete="family-name" placeholder="Apellidos" className="w-full p-2.5 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} />
                 </div>
               </div>
-              <div className="space-y-1 lg:space-y-2">
-                <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">Correo Electrónico</label>
-                <input type="email" name="email" autoComplete="email" placeholder="ejemplo@correo.com" className="w-full p-3 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm lg:text-base font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
+              <div className="space-y-1">
+                <label className="text-[8px] lg:text-[10px] font-black uppercase text-slate-400 ml-2">Correo Electrónico</label>
+                <input type="email" name="email" autoComplete="email" placeholder="ejemplo@correo.com" className="w-full p-2.5 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
               </div>
-              <div className="grid grid-cols-2 gap-3 lg:gap-4">
-                <div className="space-y-1 lg:space-y-2">
-                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">DNI / RUC</label>
-                  <input type="text" name="docNumber" autoComplete="off" placeholder="Documento" className="w-full p-3 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm lg:text-base font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.docNumber} onChange={e => setFormData({ ...formData, docNumber: e.target.value })} />
+              <div className="grid grid-cols-2 gap-2 lg:gap-4">
+                <div className="space-y-1">
+                  <label className="text-[8px] lg:text-[10px] font-black uppercase text-slate-400 ml-2">DNI / RUC</label>
+                  <input type="text" name="docNumber" autoComplete="off" placeholder="Documento" className="w-full p-2.5 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.docNumber} onChange={e => setFormData({ ...formData, docNumber: e.target.value })} />
                 </div>
-                <div className="space-y-1 lg:space-y-2">
-                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">Teléfono</label>
-                  <input type="tel" name="phone" autoComplete="tel" placeholder="Teléfono" className="w-full p-3 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm lg:text-base font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+                <div className="space-y-1">
+                  <label className="text-[8px] lg:text-[10px] font-black uppercase text-slate-400 ml-2">Teléfono</label>
+                  <input type="tel" name="phone" autoComplete="tel" placeholder="Teléfono" className="w-full p-2.5 lg:p-5 bg-slate-50 border-none rounded-xl lg:rounded-2xl text-sm font-bold focus:ring-2 focus:ring-pragmo-blue" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
                 </div>
               </div>
 
               {/* SELECCIÓN DE MONEDA */}
-              <div className="space-y-2 pt-4 border-t border-slate-100 mt-2 lg:mt-4">
-                <label className="text-[9px] lg:text-[10px] font-black uppercase text-slate-400 ml-2 lg:ml-4">Moneda de Pago</label>
-                <div className="grid grid-cols-2 gap-2 lg:gap-3">
+              <div className="space-y-1.5 pt-3 border-t border-slate-100">
+                <label className="text-[8px] lg:text-[10px] font-black uppercase text-slate-400 ml-2">Moneda de Pago</label>
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setSelectedCurrency('PEN')}
-                    className={`p-3 lg:p-5 rounded-xl lg:rounded-2xl font-bold transition-all flex items-center justify-center gap-2 lg:gap-3 border-2 ${selectedCurrency === 'PEN' ? 'bg-white border-pragmo-blue text-pragmo-blue shadow-xl shadow-blue-500/10' : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'}`}
+                    className={`p-2.5 lg:p-5 rounded-xl lg:rounded-2xl font-bold transition-all flex items-center justify-center gap-2 border-2 active:scale-95 ${selectedCurrency === 'PEN' ? 'bg-white border-pragmo-blue text-pragmo-blue shadow-lg' : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'}`}
                   >
-                    <span className="text-lg lg:text-2xl">🇵🇪</span>
+                    <span className="text-base lg:text-2xl">🇵🇪</span>
                     <div className="text-left leading-tight">
                       <p className="text-[10px] lg:text-xs font-black">SOLES</p>
-                      <p className="text-[9px] lg:text-[10px] opacity-75">S/ {(total * EXCHANGE_RATE).toFixed(2)}</p>
+                      <p className="text-[8px] lg:text-[10px] opacity-75">S/ {(total * EXCHANGE_RATE).toFixed(2)}</p>
                     </div>
                   </button>
                   <button
                     type="button"
                     onClick={() => setSelectedCurrency('USD')}
-                    className={`p-3 lg:p-5 rounded-xl lg:rounded-2xl font-bold transition-all flex items-center justify-center gap-2 lg:gap-3 border-2 ${selectedCurrency === 'USD' ? 'bg-white border-green-500 text-green-600 shadow-xl shadow-green-500/10' : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'}`}
+                    className={`p-2.5 lg:p-5 rounded-xl lg:rounded-2xl font-bold transition-all flex items-center justify-center gap-2 border-2 active:scale-95 ${selectedCurrency === 'USD' ? 'bg-white border-green-500 text-green-600 shadow-lg' : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'}`}
                   >
-                    <span className="text-lg lg:text-2xl">🇺🇸</span>
+                    <span className="text-base lg:text-2xl">🇺🇸</span>
                     <div className="text-left leading-tight">
                       <p className="text-[10px] lg:text-xs font-black">USD</p>
-                      <p className="text-[9px] lg:text-[10px] opacity-75">$ {total.toFixed(2)}</p>
+                      <p className="text-[8px] lg:text-[10px] opacity-75">$ {total.toFixed(2)}</p>
                     </div>
                   </button>
                 </div>
               </div>
 
-              <button onClick={handleContinue} disabled={loadingToken || !formData.email || !formData.firstName} className="w-full py-4 lg:py-6 bg-pragmo-blue hover:bg-blue-800 text-white font-black rounded-xl lg:rounded-3xl shadow-xl shadow-blue-500/20 disabled:opacity-50 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm lg:text-lg mt-4 lg:mt-8">
+              {/* Resumen móvil del pedido */}
+              <div className="lg:hidden bg-slate-50 rounded-xl p-3 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Tu Pedido ({cart.length})</span>
+                  <span className="text-sm font-black text-slate-900">{getCurrencySymbol()} {getFinalTotal().toFixed(2)}</span>
+                </div>
+                {DISCOUNT_PERCENT > 0 && (
+                  <div className="flex items-center gap-2 text-green-600">
+                    <span className="material-symbols-outlined text-sm">local_offer</span>
+                    <span className="text-[10px] font-bold">-{DISCOUNT_PERCENT}% descuento aplicado</span>
+                  </div>
+                )}
+              </div>
+
+              <button onClick={handleContinue} disabled={loadingToken || !formData.email || !formData.firstName} className="w-full py-3.5 lg:py-6 bg-pragmo-blue hover:bg-blue-800 text-white font-black rounded-xl lg:rounded-3xl shadow-xl shadow-blue-500/20 disabled:opacity-50 transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-sm lg:text-lg">
                 {loadingToken ? (
                   <div className="size-5 lg:size-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <>
+                    <span className="material-symbols-outlined text-lg">lock</span>
                     Pagar {getCurrencySymbol()} {getFinalTotal().toFixed(2)}
-                    {DISCOUNT_PERCENT > 0 && <span className="ml-1 bg-yellow-400 text-yellow-900 text-[10px] lg:text-xs px-2 py-0.5 rounded-full">-{DISCOUNT_PERCENT}%</span>}
+                    {DISCOUNT_PERCENT > 0 && <span className="ml-1 bg-yellow-400 text-yellow-900 text-[9px] lg:text-xs px-1.5 py-0.5 rounded-full">-{DISCOUNT_PERCENT}%</span>}
                   </>
                 )}
               </button>
@@ -598,87 +614,74 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
           )}
 
           {step === 3 && (
-            <div className="space-y-6 animate-in slide-in-from-right duration-500">
+            <div className="space-y-4 lg:space-y-6 animate-in slide-in-from-right duration-500">
               {/* Header de éxito */}
-              <div className="bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 p-8 rounded-3xl flex flex-col items-center justify-center text-center space-y-4 relative overflow-hidden">
+              <div className="bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 p-5 lg:p-8 rounded-2xl lg:rounded-3xl flex flex-col items-center justify-center text-center space-y-3 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '20px 20px'}}></div>
                 <div className="relative">
-                  <div className="size-24 bg-white text-green-500 rounded-full flex items-center justify-center shadow-2xl shadow-green-900/30 animate-bounce">
-                    <span className="material-symbols-outlined text-5xl">check_circle</span>
+                  <div className="size-16 lg:size-24 bg-white text-green-500 rounded-full flex items-center justify-center shadow-2xl shadow-green-900/30 animate-bounce">
+                    <span className="material-symbols-outlined text-3xl lg:text-5xl">check_circle</span>
                   </div>
                 </div>
                 <div className="relative">
-                  <h2 className="text-3xl font-black text-white drop-shadow-lg">¡Pago Exitoso!</h2>
-                  <p className="text-white/90 font-medium mt-2">Gracias por tu compra, <span className="font-bold">{formData.firstName}</span></p>
-                  <p className="text-white/70 text-sm mt-1">Un correo de confirmación fue enviado a {formData.email}</p>
+                  <h2 className="text-xl lg:text-3xl font-black text-white drop-shadow-lg">¡Pago Exitoso!</h2>
+                  <p className="text-white/90 font-medium text-sm lg:text-base mt-1">Gracias, <span className="font-bold">{formData.firstName}</span></p>
+                  <p className="text-white/70 text-xs lg:text-sm mt-0.5">Confirmación enviada a {formData.email}</p>
                 </div>
               </div>
 
               {/* Sección de descargas */}
-              <div className="bg-white p-6 rounded-[2.5rem] border-2 border-slate-100 shadow-lg">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="size-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center">
-                    <span className="material-symbols-outlined text-2xl">folder_zip</span>
+              <div className="bg-white p-4 lg:p-6 rounded-2xl lg:rounded-[2.5rem] border-2 border-slate-100 shadow-lg">
+                <div className="flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6">
+                  <div className="size-10 lg:size-12 bg-blue-100 text-blue-600 rounded-xl lg:rounded-2xl flex items-center justify-center">
+                    <span className="material-symbols-outlined text-xl lg:text-2xl">folder_zip</span>
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-800">Tus Recursos Digitales</h3>
-                    <p className="text-xs text-slate-400">Descarga tus archivos ahora mismo</p>
+                    <h3 className="text-sm lg:text-lg font-black text-slate-800">Tus Recursos</h3>
+                    <p className="text-[10px] lg:text-xs text-slate-400">Descarga ahora</p>
                   </div>
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {cart.map((item, idx) => (
-                    <div key={idx} className="group relative bg-gradient-to-br from-slate-50 to-white rounded-2xl border-2 border-slate-100 hover:border-blue-300 hover:shadow-xl transition-all duration-300 overflow-hidden">
-                      {/* Imagen de fondo decorativa */}
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                      
-                      <div className="relative p-5">
-                        <div className="flex items-start gap-4">
-                          {/* Imagen del producto */}
-                          <div className="relative">
+                    <div key={idx} className="group relative bg-gradient-to-br from-slate-50 to-white rounded-xl lg:rounded-2xl border-2 border-slate-100 overflow-hidden">
+                      <div className="relative p-3 lg:p-5">
+                        <div className="flex items-start gap-3">
+                          <div className="relative shrink-0">
                             <img 
                               src={item.imageUrl} 
                               alt={item.name}
-                              className="size-20 rounded-xl object-cover shadow-lg group-hover:scale-105 transition-transform duration-300"
+                              className="size-14 lg:size-20 rounded-lg lg:rounded-xl object-cover shadow-lg"
                             />
-                            <div className="absolute -bottom-2 -right-2 size-8 bg-green-500 text-white rounded-lg flex items-center justify-center shadow-lg">
-                              <span className="material-symbols-outlined text-sm">verified</span>
+                            <div className="absolute -bottom-1 -right-1 size-5 lg:size-8 bg-green-500 text-white rounded-md lg:rounded-lg flex items-center justify-center shadow-lg">
+                              <span className="material-symbols-outlined text-xs lg:text-sm">verified</span>
                             </div>
                           </div>
                           
-                          {/* Info del producto */}
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-black text-slate-800 text-lg leading-tight line-clamp-2 mb-2">{item.name}</h4>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              {item.fileType?.map((type, i) => (
-                                <span key={i} className="px-2 py-1 bg-slate-200 text-slate-600 rounded-lg text-[10px] font-black uppercase">
-                                  {type}
-                                </span>
-                              ))}
-                              <span className="px-2 py-1 bg-green-100 text-green-700 rounded-lg text-[10px] font-black uppercase">
+                            <h4 className="font-bold lg:font-black text-slate-800 text-sm lg:text-lg leading-tight line-clamp-2">{item.name}</h4>
+                            <div className="flex items-center gap-1 flex-wrap mt-1">
+                              <span className="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-[8px] lg:text-[10px] font-black uppercase">
                                 ✓ Pagado
                               </span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-2 line-clamp-2">{item.description}</p>
                           </div>
                         </div>
                         
-                        {/* Botón de descarga grande y llamativo */}
                         {item.link && item.link !== '#' && item.link.startsWith('http') ? (
                           <a
                             href={item.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-4 w-full flex items-center justify-center gap-3 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-black rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-95 group/btn"
+                            className="mt-3 w-full flex items-center justify-center gap-2 py-3 lg:py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold lg:font-black rounded-lg lg:rounded-xl shadow-lg transition-all active:scale-[0.97] text-sm"
                           >
-                            <span className="material-symbols-outlined text-xl group-hover/btn:animate-bounce">cloud_download</span>
-                            <span>Descargar Ahora</span>
-                            <span className="material-symbols-outlined text-lg opacity-50">arrow_forward</span>
+                            <span className="material-symbols-outlined text-lg lg:text-xl">cloud_download</span>
+                            <span>Descargar</span>
                           </a>
                         ) : (
-                          <div className="mt-4 w-full flex items-center justify-center gap-2 py-4 bg-amber-50 text-amber-600 font-bold rounded-xl border border-amber-200">
-                            <span className="material-symbols-outlined">mail</span>
-                            <span>Link será enviado a tu correo</span>
+                          <div className="mt-3 w-full flex items-center justify-center gap-2 py-3 bg-amber-50 text-amber-600 font-bold rounded-lg border border-amber-200 text-xs lg:text-sm">
+                            <span className="material-symbols-outlined text-base">mail</span>
+                            <span>Link en tu correo</span>
                           </div>
                         )}
                       </div>
@@ -688,77 +691,76 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
               </div>
 
               {/* Mensaje informativo */}
-              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
-                <span className="material-symbols-outlined text-blue-500">info</span>
-                <div className="text-sm">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-start gap-2">
+                <span className="material-symbols-outlined text-blue-500 text-lg shrink-0">info</span>
+                <div className="text-xs lg:text-sm">
                   <p className="font-bold text-blue-800">Guarda estos enlaces</p>
-                  <p className="text-blue-600">Los links de descarga también fueron enviados a tu correo electrónico.</p>
+                  <p className="text-blue-600">También fueron enviados a tu correo.</p>
                 </div>
               </div>
 
-              <button onClick={() => { clearCart(); onClose(); }} className="w-full py-5 bg-slate-900 text-white font-black rounded-3xl hover:bg-black transition-all shadow-xl active:scale-[0.98] flex items-center justify-center gap-2">
+              <button onClick={() => { clearCart(); onClose(); }} className="w-full py-4 lg:py-5 bg-slate-900 text-white font-black rounded-xl lg:rounded-3xl hover:bg-black transition-all shadow-xl active:scale-[0.98] flex items-center justify-center gap-2 text-sm lg:text-base">
                 <span className="material-symbols-outlined">check</span>
-                Cerrar y Continuar Comprando
+                Cerrar
               </button>
             </div>
           )}
         </div>
 
-        <div className={`${step === 2 ? 'hidden' : 'w-full md:w-[420px]'} bg-slate-50 p-10 lg:p-14 flex flex-col border-l border-slate-100`}>
-          <h4 className="font-black text-xs uppercase text-slate-400 mb-10 tracking-[0.2em]">Tu Pedido</h4>
-          <div className="space-y-4 flex-1 overflow-y-auto max-h-[300px] pr-2">
+        <div className={`${step === 2 ? 'hidden' : 'hidden lg:flex lg:w-[380px]'} bg-slate-50 p-8 lg:p-10 flex-col border-l border-slate-100`}>
+          <h4 className="font-black text-xs uppercase text-slate-400 mb-6 tracking-[0.2em]">Tu Pedido</h4>
+          <div className="space-y-3 flex-1 overflow-y-auto max-h-[280px] pr-2">
             {cart.map(item => {
-              // Si la moneda seleccionada es PEN, mostramos precio convertido. Si es USD, precio base.
-              // Asumimos item.price es USD.
               const itemPrice = selectedCurrency === 'PEN' ? item.price * EXCHANGE_RATE : item.price;
 
               return (
-                <div key={item.id} className="flex gap-4 items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm relative group">
-                  <img src={item.imageUrl} className="size-16 rounded-xl object-cover" alt={item.name} />
-                  <div className="flex-1">
-                    <p className="text-[13px] font-black text-slate-800 line-clamp-1">{item.name}</p>
-                    <p className="text-[13px] font-black text-pragmo-blue mt-0.5">{getCurrencySymbol()} {itemPrice.toFixed(2)}</p>
+                <div key={item.id} className="flex gap-3 items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm relative group">
+                  <img src={item.imageUrl} className="size-14 rounded-lg object-cover" alt={item.name} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-black text-slate-800 line-clamp-1">{item.name}</p>
+                    <p className="text-xs font-black text-pragmo-blue mt-0.5">{getCurrencySymbol()} {itemPrice.toFixed(2)}</p>
                   </div>
-                  {step === 1 && (<button onClick={() => removeFromCart(item.id)} className="size-8 text-slate-200 hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-xl">delete</span></button>)}
+                  {step === 1 && (<button onClick={() => removeFromCart(item.id)} className="size-8 text-slate-200 hover:text-red-500 transition-colors shrink-0"><span className="material-symbols-outlined text-lg">delete</span></button>)}
                 </div>
               );
             })}
           </div>
-          <div className="mt-6 pt-6 border-t border-slate-200">
+          <div className="mt-4 pt-4 border-t border-slate-200">
             {/* Banner de descuento */}
             {DISCOUNT_PERCENT > 0 && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl text-white relative overflow-hidden">
-                <div className="absolute -right-4 -top-4 text-8xl opacity-20">🔥</div>
+              <div className="mb-4 p-3 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl text-white relative overflow-hidden">
+                <div className="absolute -right-4 -top-4 text-6xl opacity-20">🔥</div>
                 <div className="relative">
-                  <p className="font-black text-lg">{PROMO_NAME}</p>
-                  <p className="text-sm opacity-90">{PROMO_MESSAGE}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="bg-white text-red-600 px-3 py-1 rounded-full text-sm font-black">-{DISCOUNT_PERCENT}% OFF</span>
-                    <span className="text-sm">Ahorras {getCurrencySymbol()} {getDiscountAmount().toFixed(2)}</span>
+                  <p className="font-black text-sm">{PROMO_NAME}</p>
+                  <p className="text-[10px] opacity-90">{PROMO_MESSAGE}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="bg-white text-red-600 px-2 py-0.5 rounded-full text-[10px] font-black">-{DISCOUNT_PERCENT}%</span>
+                    <span className="text-[10px]">Ahorras {getCurrencySymbol()} {getDiscountAmount().toFixed(2)}</span>
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="flex justify-between items-end mb-6">
+            <div className="flex justify-between items-end mb-4">
               <div>
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Total Final</span>
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Final</span>
                 {DISCOUNT_PERCENT > 0 ? (
                   <div>
-                    <span className="text-2xl text-slate-400 line-through mr-2">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</span>
-                    <span className="text-4xl font-black text-green-600 tracking-tighter">{getCurrencySymbol()} {getFinalTotal().toFixed(2)}</span>
+                    <span className="text-lg text-slate-400 line-through mr-2">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</span>
+                    <span className="text-2xl font-black text-green-600">{getCurrencySymbol()} {getFinalTotal().toFixed(2)}</span>
                   </div>
                 ) : (
-                  <span className="text-5xl font-black text-slate-900 tracking-tighter">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</span>
+                  <span className="text-3xl font-black text-slate-900">{getCurrencySymbol()} {getTotalInCurrency().toFixed(2)}</span>
                 )}
-                {selectedCurrency === 'PEN' && <p className="text-[10px] text-slate-400 mt-1">T.C. Referencial S/ {EXCHANGE_RATE.toFixed(2)}</p>}
+                {selectedCurrency === 'PEN' && <p className="text-[9px] text-slate-400 mt-0.5">T.C. S/ {EXCHANGE_RATE.toFixed(2)}</p>}
               </div>
-              <div className="text-right"><p className="text-[10px] font-bold text-slate-400 uppercase">Artículos: {cart.length}</p></div>
+              <div className="text-right"><p className="text-[9px] font-bold text-slate-400">{cart.length} items</p></div>
             </div>
 
-            <div className="mt-6 bg-slate-900 rounded-xl p-4 h-[150px] overflow-y-auto font-mono text-[10px] border border-slate-800 shadow-inner">
-              <p className="text-slate-500 font-bold mb-2 uppercase tracking-widest border-b border-slate-700 pb-1">Debug Console</p>
-              {logs.length === 0 ? (<p className="text-slate-600 italic">Esperando acciones...</p>) : (logs.map((log, i) => (<p key={i} className="text-green-400 mb-1 break-all border-b border-white/5 pb-0.5"><span className="text-slate-500 mr-2 opacity-50">&gt;</span>{log}</p>)))}
+            {/* Debug console - oculto en móvil */}
+            <div className="hidden lg:block mt-4 bg-slate-900 rounded-lg p-3 h-[120px] overflow-y-auto font-mono text-[9px] border border-slate-800">
+              <p className="text-slate-500 font-bold mb-1 uppercase tracking-widest border-b border-slate-700 pb-1">Debug</p>
+              {logs.length === 0 ? (<p className="text-slate-600 italic">Esperando...</p>) : (logs.slice(-5).map((log, i) => (<p key={i} className="text-green-400 mb-0.5 break-all"><span className="text-slate-500 mr-1 opacity-50">&gt;</span>{log}</p>)))}
             </div>
           </div>
         </div>

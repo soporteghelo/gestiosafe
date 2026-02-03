@@ -26,55 +26,77 @@ const TemplateDetailsDrawer: React.FC<{
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (template) setIsOpen(true);
-    else setIsOpen(false);
+    if (template) {
+      setIsOpen(true);
+      // Bloquear scroll del body en móvil
+      document.body.style.overflow = 'hidden';
+    } else {
+      setIsOpen(false);
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
   }, [template]);
 
   if (!template) return null;
   const alreadyInCart = cart.some(item => item.id === template.id);
 
+  const handleClose = () => {
+    setIsOpen(false);
+    setTimeout(onClose, 300);
+  };
+
   return (
     <>
       <div
-        className={`fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        onClick={() => { setIsOpen(false); setTimeout(onClose, 300); }}
+        className={`fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[110] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={handleClose}
       />
-      <div className={`fixed top-0 right-0 h-full w-full max-w-lg bg-white z-[120] shadow-2xl transition-transform duration-500 ease-out transform flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="p-6 flex items-center justify-between border-b border-slate-100">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-pragmo-blue">description</span>
-            <h2 className="font-extrabold text-slate-800 uppercase tracking-tighter">Detalles del Recurso</h2>
+      {/* Mobile: Bottom Sheet / Desktop: Side Drawer */}
+      <div className={`fixed z-[120] bg-white shadow-2xl transition-all duration-500 ease-out flex flex-col
+        lg:top-0 lg:right-0 lg:h-full lg:w-full lg:max-w-lg lg:rounded-none
+        inset-x-0 bottom-0 max-h-[90vh] rounded-t-[2rem]
+        ${isOpen ? 'translate-y-0 lg:translate-y-0 lg:translate-x-0' : 'translate-y-full lg:translate-y-0 lg:translate-x-full'}`}
+      >
+        {/* Drag handle móvil */}
+        <div className="lg:hidden flex justify-center pt-3 pb-1">
+          <div className="w-12 h-1.5 bg-slate-300 rounded-full"></div>
+        </div>
+
+        <div className="p-4 lg:p-6 flex items-center justify-between border-b border-slate-100">
+          <div className="flex items-center gap-2 lg:gap-3">
+            <span className="material-symbols-outlined text-pragmo-blue text-xl lg:text-2xl">description</span>
+            <h2 className="font-extrabold text-slate-800 uppercase tracking-tighter text-sm lg:text-base">Detalles</h2>
           </div>
-          <button onClick={() => { setIsOpen(false); setTimeout(onClose, 300); }} className="size-10 hover:bg-slate-100 rounded-full flex items-center justify-center transition-colors">
-            <span className="material-symbols-outlined">close</span>
+          <button onClick={handleClose} className="size-9 lg:size-10 hover:bg-slate-100 active:bg-slate-200 rounded-full flex items-center justify-center transition-colors">
+            <span className="material-symbols-outlined text-xl">close</span>
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 space-y-8">
-          <div className="aspect-video rounded-3xl overflow-hidden shadow-lg bg-slate-100">
+        <div className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-4 lg:space-y-8">
+          <div className="aspect-video rounded-xl lg:rounded-3xl overflow-hidden shadow-lg bg-slate-100">
             <img src={template.imageUrl} className="w-full h-full object-cover" alt={template.name} />
           </div>
-          <div className="space-y-4">
-            <div className="flex gap-2">
-              <span className="bg-pragmo-green/10 text-pragmo-green text-[10px] font-bold px-3 py-1 rounded-lg uppercase">{template.sector}</span>
-              <span className="bg-slate-100 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-lg uppercase">{template.category}</span>
+          <div className="space-y-3 lg:space-y-4">
+            <div className="flex gap-2 flex-wrap">
+              <span className="bg-pragmo-green/10 text-pragmo-green text-[9px] lg:text-[10px] font-bold px-2 lg:px-3 py-1 rounded-lg uppercase">{template.sector}</span>
+              <span className="bg-slate-100 text-slate-500 text-[9px] lg:text-[10px] font-bold px-2 lg:px-3 py-1 rounded-lg uppercase">{template.category}</span>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-black text-slate-900 leading-tight">{template.name}</h1>
-            <p className="text-slate-500 text-sm leading-relaxed">{template.description}</p>
+            <h1 className="text-lg lg:text-3xl font-black text-slate-900 leading-tight">{template.name}</h1>
+            <p className="text-slate-500 text-xs lg:text-sm leading-relaxed">{template.description}</p>
           </div>
         </div>
 
-        <div className="p-8 border-t border-slate-100 bg-white flex items-center justify-between gap-6">
+        <div className="p-4 lg:p-8 border-t border-slate-100 bg-white flex items-center justify-between gap-4 lg:gap-6 safe-area-bottom">
           <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Inversión única</span>
-            <p className="text-2xl lg:text-3xl font-black text-slate-900">${template.price.toFixed(2)}</p>
+            <span className="text-[9px] lg:text-[10px] font-bold text-slate-400 uppercase block mb-0.5 lg:mb-1">Inversión</span>
+            <p className="text-xl lg:text-3xl font-black text-slate-900">${template.price.toFixed(2)}</p>
           </div>
           <button
             disabled={alreadyInCart}
-            onClick={() => { onAddToCart(template); setIsOpen(false); setTimeout(onClose, 300); }}
-            className={`flex-1 py-4 rounded-2xl font-bold transition-all shadow-lg ${alreadyInCart ? 'bg-slate-100 text-slate-400' : 'bg-pragmo-blue hover:bg-blue-800 text-white active:scale-95'}`}
+            onClick={() => { onAddToCart(template); handleClose(); }}
+            className={`flex-1 py-3.5 lg:py-4 rounded-xl lg:rounded-2xl font-bold text-sm lg:text-base transition-all shadow-lg ${alreadyInCart ? 'bg-slate-100 text-slate-400' : 'bg-pragmo-blue hover:bg-blue-800 text-white active:scale-[0.97]'}`}
           >
-            {alreadyInCart ? 'Agregado' : 'Añadir al Carrito'}
+            {alreadyInCart ? '✓ Agregado' : 'Añadir al Carrito'}
           </button>
         </div>
       </div>
@@ -220,16 +242,15 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-[#f8fafc]">
       {/* Banner de Descuento */}
       {DISCOUNT_PERCENT > 0 && (
-        <div className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 text-white py-2.5 px-4 text-center relative overflow-hidden">
+        <div className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 text-white py-2 lg:py-2.5 px-3 lg:px-4 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIiBjeD0iMjAiIGN5PSIyMCIgcj0iMyIvPjwvZz48L3N2Zz4=')] opacity-30"></div>
-          <div className="relative flex items-center justify-center gap-3 flex-wrap">
-            <span className="text-2xl animate-bounce">🔥</span>
-            <span className="font-black text-sm md:text-base uppercase tracking-wider">{PROMO_NAME}</span>
-            <span className="bg-white text-red-600 px-3 py-1 rounded-full text-xs md:text-sm font-black animate-pulse">
-              -{DISCOUNT_PERCENT}% OFF
+          <div className="relative flex items-center justify-center gap-2 lg:gap-3">
+            <span className="text-lg lg:text-2xl">🔥</span>
+            <span className="font-black text-xs lg:text-base uppercase tracking-wide lg:tracking-wider">{PROMO_NAME}</span>
+            <span className="bg-white text-red-600 px-2 lg:px-3 py-0.5 lg:py-1 rounded-full text-[10px] lg:text-sm font-black animate-pulse">
+              -{DISCOUNT_PERCENT}%
             </span>
-            <span className="text-xs md:text-sm font-medium hidden sm:inline">{PROMO_MESSAGE}</span>
-            <span className="text-2xl animate-bounce">🔥</span>
+            <span className="text-[10px] lg:text-sm font-medium hidden sm:inline">{PROMO_MESSAGE}</span>
           </div>
         </div>
       )}
@@ -317,36 +338,38 @@ const AppContent: React.FC = () => {
       )}
 
       {/* Hero Section */}
-      <header className="bg-background-dark pt-8 lg:pt-24 pb-12 lg:pb-32 relative overflow-hidden">
+      <header className="bg-background-dark pt-6 lg:pt-24 pb-8 lg:pb-32 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-pragmo-cyan/10 to-transparent"></div>
-        <div className="max-w-[1440px] mx-auto px-4 lg:px-20 grid lg:grid-cols-2 gap-8 lg:gap-16 items-center relative z-10">
-          <div className="space-y-4 lg:space-y-8 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
+        <div className="max-w-[1440px] mx-auto px-4 lg:px-20 grid lg:grid-cols-2 gap-6 lg:gap-16 items-center relative z-10">
+          <div className="space-y-3 lg:space-y-8 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-2.5 lg:px-3 py-1 bg-white/5 rounded-full border border-white/10">
               <span className="size-1.5 bg-pragmo-cyan rounded-full animate-pulse"></span>
-              <span className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-slate-300">NUEVO CATÁLOGO 2024</span>
+              <span className="text-[8px] lg:text-[10px] font-bold uppercase tracking-widest text-slate-300">CATÁLOGO 2024</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-7xl font-black text-white leading-tight tracking-tight">
-              Digitaliza tu{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-500">Seguridad Laboral</span>
-              <span className="hidden lg:inline"><br />con Plantillas Expertas</span>
+            <h1 className="text-xl sm:text-2xl lg:text-7xl font-black text-white leading-tight tracking-tight">
+              <span className="lg:hidden">Plantillas SST<br/>Profesionales</span>
+              <span className="hidden lg:inline">Digitaliza tu{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-500">Seguridad Laboral</span>
+                <br />con Plantillas Expertas
+              </span>
             </h1>
-            <p className="text-slate-400 text-sm lg:text-xl max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Documentos listos para usar, diseñados por especialistas en prevención.
+            <p className="text-slate-400 text-xs lg:text-xl max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Documentos listos para usar, diseñados por especialistas.
             </p>
-            <div className="flex flex-row gap-3 justify-center lg:justify-start">
-              <button onClick={() => scrollTo('catalog')} className="flex-1 sm:flex-none px-6 lg:px-10 py-3 lg:py-5 bg-pragmo-cyan hover:bg-cyan-500 text-background-dark text-sm lg:text-base font-black rounded-xl lg:rounded-2xl shadow-xl shadow-cyan-500/20 transition-all flex items-center justify-center gap-2">
+            <div className="flex flex-row gap-2 lg:gap-3 justify-center lg:justify-start">
+              <button onClick={() => scrollTo('catalog')} className="flex-1 sm:flex-none px-5 lg:px-10 py-3 lg:py-5 bg-pragmo-cyan hover:bg-cyan-500 active:bg-cyan-600 text-background-dark text-xs lg:text-base font-black rounded-xl lg:rounded-2xl shadow-xl shadow-cyan-500/20 transition-all flex items-center justify-center gap-1.5 lg:gap-2">
                 Ver Catálogo
-                <span className="material-symbols-outlined text-lg lg:text-2xl">arrow_forward</span>
+                <span className="material-symbols-outlined text-base lg:text-2xl">arrow_forward</span>
               </button>
-              <button onClick={handleContactWhatsApp} className="sm:hidden flex-1 px-6 py-3 bg-pragmo-blue text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2">
-                <span className="material-symbols-outlined text-lg">chat</span>
+              <button onClick={handleContactWhatsApp} className="sm:hidden flex-1 px-5 py-3 bg-green-600 active:bg-green-700 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5">
+                <span className="material-symbols-outlined text-base">chat</span>
                 WhatsApp
               </button>
             </div>
           </div>
-          <div className="relative hidden sm:block">
-            <div className="relative z-10 bg-slate-800 p-3 rounded-[2rem] lg:rounded-[2.5rem] shadow-2xl border-4 border-slate-700/50">
-              <div className="bg-slate-900 rounded-[1.8rem] lg:rounded-[2rem] overflow-hidden aspect-[16/11] relative">
+          <div className="relative hidden lg:block">
+            <div className="relative z-10 bg-slate-800 p-3 rounded-[2.5rem] shadow-2xl border-4 border-slate-700/50">
+              <div className="bg-slate-900 rounded-[2rem] overflow-hidden aspect-[16/11] relative">
                 <img src="https://images.unsplash.com/photo-1557426282-2d8d5942da5b?auto=format&fit=crop&q=80&w=1200" className="w-full h-full object-cover opacity-60" />
               </div>
             </div>
@@ -355,37 +378,70 @@ const AppContent: React.FC = () => {
       </header>
 
       <section id="catalog" className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-12 p-3 lg:p-12 max-w-[1920px] mx-auto w-full relative">
-        {/* Barra de búsqueda y filtros móviles */}
-        <div className="lg:hidden space-y-3 mb-2">
+        {/* Barra de búsqueda y filtros móviles - Sticky */}
+        <div className="lg:hidden sticky top-16 z-50 bg-[#f8fafc] -mx-3 px-3 py-2 space-y-2">
           <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Buscar plantilla..."
-              className="flex-1 px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pragmo-blue text-sm font-medium"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <div className="flex-1 relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+              <input
+                type="text"
+                placeholder="Buscar..."
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pragmo-blue focus:border-pragmo-blue text-sm font-medium shadow-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  <span className="material-symbols-outlined text-lg">close</span>
+                </button>
+              )}
+            </div>
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
-              className="px-4 py-3 bg-pragmo-blue text-white rounded-xl flex items-center gap-2"
+              className={`px-3.5 py-2.5 rounded-xl flex items-center justify-center transition-all shadow-sm ${
+                activeSector || activeCategory 
+                  ? 'bg-pragmo-blue text-white' 
+                  : 'bg-white border border-slate-200 text-slate-600'
+              }`}
             >
               <span className="material-symbols-outlined text-lg">tune</span>
+              {(activeSector || activeCategory) && (
+                <span className="ml-1 size-5 bg-white text-pragmo-blue text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {(activeSector ? 1 : 0) + (activeCategory ? 1 : 0)}
+                </span>
+              )}
             </button>
           </div>
           {(activeSector || activeCategory) && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 items-center">
+              <span className="text-[10px] text-slate-400 font-medium">Filtros:</span>
               {activeSector && (
-                <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-pragmo-blue/10 text-pragmo-blue text-xs font-bold rounded-lg">
+                <button 
+                  onClick={() => setActiveSector(null)} 
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-pragmo-blue text-white text-[10px] font-bold rounded-full active:scale-95"
+                >
                   {activeSector}
-                  <button onClick={() => setActiveSector(null)} className="ml-1">×</button>
-                </span>
+                  <span className="material-symbols-outlined text-sm">close</span>
+                </button>
               )}
               {activeCategory && (
-                <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-pragmo-green/10 text-pragmo-green text-xs font-bold rounded-lg">
+                <button 
+                  onClick={() => setActiveCategory(null)} 
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-pragmo-green text-white text-[10px] font-bold rounded-full active:scale-95"
+                >
                   {activeCategory}
-                  <button onClick={() => setActiveCategory(null)} className="ml-1">×</button>
-                </span>
+                  <span className="material-symbols-outlined text-sm">close</span>
+                </button>
               )}
+              <button 
+                onClick={() => { setActiveSector(null); setActiveCategory(null); }}
+                className="text-[10px] text-slate-500 underline ml-1"
+              >
+                Limpiar
+              </button>
             </div>
           )}
         </div>
@@ -450,17 +506,26 @@ const AppContent: React.FC = () => {
           </div>
         </aside>
 
-        <main className="flex-1 space-y-4 lg:space-y-8">
-          <div className="bg-white p-3 lg:p-6 lg:px-10 rounded-xl lg:rounded-[2.5rem] shadow-sm border border-slate-100 flex items-center justify-between">
-            <p className="text-[11px] lg:text-sm font-bold text-slate-400">Resultados: <span className="text-slate-900 font-black">{filteredTemplates.length}</span></p>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="bg-slate-50 border-slate-200 rounded-lg lg:rounded-xl text-[11px] lg:text-xs font-bold py-2 lg:py-2.5 px-2">
-              <option value="popular">Populares</option>
-              <option value="price-low">Menor Precio</option>
-              <option value="price-high">Mayor Precio</option>
+        <main className="flex-1 space-y-3 lg:space-y-8">
+          <div className="bg-white p-2.5 lg:p-6 lg:px-10 rounded-xl lg:rounded-[2.5rem] shadow-sm border border-slate-100 flex items-center justify-between">
+            <p className="text-[10px] lg:text-sm font-bold text-slate-400">
+              <span className="hidden sm:inline">Resultados: </span>
+              <span className="text-slate-900 font-black">{filteredTemplates.length}</span>
+              <span className="sm:hidden text-slate-400"> items</span>
+            </p>
+            <select 
+              value={sortBy} 
+              onChange={e => setSortBy(e.target.value)} 
+              className="bg-slate-50 border border-slate-200 rounded-lg lg:rounded-xl text-[10px] lg:text-xs font-bold py-1.5 lg:py-2.5 px-2 pr-6 appearance-none cursor-pointer"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1rem' }}
+            >
+              <option value="popular">Popular</option>
+              <option value="price-low">Menor $</option>
+              <option value="price-high">Mayor $</option>
             </select>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 lg:gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2.5 lg:gap-8">
             {displayedTemplates.map(t => (
               <TemplateCard key={t.id} template={t} onSelect={setSelectedTemplate} />
             ))}
