@@ -242,15 +242,23 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     const itemsWithPrices = cart.map(i => ({
       name: i.name,
       price: selectedCurrency === 'PEN' ? i.price * EXCHANGE_RATE : i.price,
-      link: i.link || ''
+      link: i.link || '',
+      description: i.description || '',
+      imageUrl: i.imageUrl || ''
     }));
 
     // Guardar datos del checkout en localStorage para recuperarlos después del pago
+    // IMPORTANTE: Guardar todos los datos necesarios para mostrar después del pago
     const checkoutData = {
       items: cart.map(i => ({
+        id: i.id,
         name: i.name,
+        description: i.description || '',
         price: selectedCurrency === 'PEN' ? i.price * EXCHANGE_RATE : i.price,
-        link: i.link || ''
+        link: i.link || '',
+        imageUrl: i.imageUrl || '',
+        fileType: i.fileType || [],
+        category: i.category || ''
       })),
       customer: {
         email: formData.email,
@@ -260,6 +268,8 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
       currency: selectedCurrency,
       timestamp: Date.now()
     };
+    
+    console.log('💾 Guardando checkout data:', checkoutData);
     localStorage.setItem('gestiosafe_pending_checkout', JSON.stringify(checkoutData));
     addLog('💾 Datos guardados en localStorage para recuperar después del pago');
 

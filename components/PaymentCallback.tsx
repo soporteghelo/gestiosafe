@@ -7,16 +7,22 @@ interface PaymentCallbackProps {
   onSuccess: () => void;
 }
 
-interface DownloadLink {
+interface PurchasedItem {
+  id: string;
   name: string;
+  description: string;
+  price: number;
   link: string;
+  imageUrl: string;
+  fileType: string[];
+  category: string;
 }
 
 const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess }) => {
   const { cart, clearCart } = useCart();
   const [status, setStatus] = useState<'loading' | 'success' | 'pending' | 'error'>('loading');
   const [paymentData, setPaymentData] = useState<any>(null);
-  const [downloadLinks, setDownloadLinks] = useState<DownloadLink[]>([]);
+  const [purchasedItems, setPurchasedItems] = useState<PurchasedItem[]>([]);
   const [message, setMessage] = useState('Verificando tu pago...');
 
   useEffect(() => {
@@ -78,18 +84,21 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
             setStatus('success');
             setMessage('¡Pago exitoso!');
             
-            // Preparar enlaces de descarga
-            console.log('🔗 Procesando links de descarga...');
-            const links: DownloadLink[] = cartItems
-              .filter((item: any) => {
-                const hasLink = item.link && item.link !== '#' && item.link !== '';
-                console.log(`  - ${item.name}: link="${item.link}" válido=${hasLink}`);
-                return hasLink;
-              })
-              .map((item: any) => ({ name: item.name, link: item.link }));
+            // Guardar los items comprados con todos sus datos
+            console.log('🔗 Procesando items comprados...');
+            const items: PurchasedItem[] = cartItems.map((item: any) => ({
+              id: item.id || '',
+              name: item.name || 'Producto',
+              description: item.description || '',
+              price: item.price || 0,
+              link: item.link || '',
+              imageUrl: item.imageUrl || '',
+              fileType: item.fileType || [],
+              category: item.category || ''
+            }));
             
-            console.log('✅ Links de descarga encontrados:', links);
-            setDownloadLinks(links);
+            console.log('✅ Items comprados:', items);
+            setPurchasedItems(items);
 
             // Limpiar localStorage y carrito
             localStorage.removeItem('gestiosafe_pending_checkout');
@@ -190,30 +199,66 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
                 </div>
               )}
 
-              {/* Download Links */}
-              {downloadLinks.length > 0 && (
-                <div className="space-y-3">
+              {/* Items Comprados con Links de Descarga */}
+              {purchasedItems.length > 0 && (
+                <div className="space-y-4">
                   <h4 className="text-sm font-black text-slate-800 uppercase tracking-wide flex items-center gap-2">
-                    <span className="material-symbols-outlined text-green-500">download</span>
-                    Tus Descargas
+                    <span className="material-symbols-outlined text-green-500">shopping_bag</span>
+                    Tus Productos ({purchasedItems.length})
                   </h4>
-                  <div className="space-y-2">
-                    {downloadLinks.map((item, idx) => (
-                      <a
+                  <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                    {purchasedItems.map((item, idx) => (
+                      <div
                         key={idx}
-                        href={item.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl hover:border-green-400 hover:shadow-lg transition-all group"
+                        className="bg-gradient-to-r from-slate-50 to-white border-2 border-slate-200 rounded-xl p-4 hover:border-green-300 transition-all"
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="size-10 bg-green-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <span className="material-symbols-outlined text-white">folder_zip</span>
+                        <div className="flex gap-4">
+                          {/* Imagen */}
+                          <div className="flex-shrink-0">
+                            <img 
+                              src={item.imageUrl || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=80&h=80&fit=crop'} 
+                              alt={item.name}
+                              className="size-16 rounded-lg object-cover border-2 border-slate-200"
+                            />
                           </div>
-                          <span className="font-bold text-slate-800 text-sm">{item.name}</span>
+                          
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <h5 className="font-bold text-slate-800 text-sm truncate">{item.name}</h5>
+                            {item.description && (
+                              <p className="text-xs text-slate-500 line-clamp-2 mt-1">{item.description}</p>
+                            )}
+                            <div className="flex items-center gap-2 mt-2">
+                              {item.category && (
+                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{item.category}</span>
+                              )}
+                              {item.fileType && item.fileType.length > 0 && (
+                                <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                                  {Array.isArray(item.fileType) ? item.fileType.join(', ') : item.fileType}
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <span className="material-symbols-outlined text-green-600 group-hover:translate-x-1 transition-transform">download</span>
-                      </a>
+                        
+                        {/* Botón de Descarga */}
+                        {item.link && item.link !== '#' && item.link !== '' ? (
+                          <a
+                            href={item.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-3 flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg shadow-green-500/25 hover:shadow-green-500/40"
+                          >
+                            <span className="material-symbols-outlined">download</span>
+                            Descargar Archivo
+                          </a>
+                        ) : (
+                          <div className="mt-3 flex items-center justify-center gap-2 w-full py-3 bg-slate-100 text-slate-500 font-medium rounded-xl">
+                            <span className="material-symbols-outlined text-sm">mail</span>
+                            Link enviado por correo
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
