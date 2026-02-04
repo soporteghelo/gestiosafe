@@ -328,8 +328,15 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
                 {(() => {
                   // Priorizar links del historial si existen y no están vacíos
                   const purchase = getPurchaseByPaymentId(paymentData?.payment_id);
-                  const items = purchase?.items || [];
-                  const hasLinks = items.some(item => item.link && item.link !== '#' && item.link !== '');
+                  let items = purchase?.items || [];
+                  let hasLinks = items.some(item => item.link && item.link !== '#' && item.link !== '');
+
+                  // Fallback inmediato: si el historial aún no tiene la compra, usar los recién comprados
+                  if ((!purchase || items.length === 0) && purchasedItems.length > 0) {
+                    items = purchasedItems;
+                    hasLinks = items.some(item => item.link && item.link !== '#' && item.link !== '');
+                  }
+
                   if (items.length > 0 && hasLinks) {
                     return (
                       <div className="space-y-3">
