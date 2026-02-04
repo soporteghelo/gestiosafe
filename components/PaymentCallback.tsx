@@ -25,6 +25,7 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
   const [status, setStatus] = useState<'loading' | 'success' | 'pending' | 'error'>('loading');
   const [viewMode, setViewMode] = useState<'summary' | 'details'>('summary');
   const [paymentData, setPaymentData] = useState<any>(null);
+  const { getPurchaseByPaymentId } = usePurchaseHistory();
   const [purchasedItems, setPurchasedItems] = useState<PurchasedItem[]>([]);
   const [customerData, setCustomerData] = useState<{ email: string; name: string }>({ email: '', name: '' });
   const [totalPaid, setTotalPaid] = useState<number>(0);
@@ -176,7 +177,6 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
 
             console.log('✅ Items comprados:', itemsWithLinks);
             setPurchasedItems(itemsWithLinks);
-
             // Guardar en historial de compras (sessionStorage) - SOLO con pago verificado
             addPurchase({
               paymentId: paymentId!,
@@ -194,7 +194,6 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
               customerEmail: customer.email,
               customerName: customer.name
             });
-
             // Limpiar datos locales (ya no los necesitamos)
             localStorage.removeItem('gestiosafe_pending_checkout');
             sessionStorage.removeItem('gestiosafe_pending_checkout');
@@ -319,16 +318,16 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
                 </div>
               </div>
 
-              {/* Lista de productos */}
+              {/* Lista de productos desde historial si está disponible */}
               <div className="space-y-3">
                 <h4 className="text-sm font-black text-slate-800 uppercase tracking-wide flex items-center gap-2">
                   <span className="material-symbols-outlined text-green-500">inventory_2</span>
                   Tus Productos ({purchasedItems.length})
                 </h4>
 
-                {purchasedItems.length > 0 ? (
+                {(getPurchaseByPaymentId(paymentData?.payment_id)?.items?.length ?? 0) > 0 ? (
                   <div className="space-y-3">
-                    {purchasedItems.map((item, idx) => (
+                    {getPurchaseByPaymentId(paymentData?.payment_id)?.items.map((item, idx) => (
                       <div
                         key={idx}
                         className="bg-white border-2 border-slate-200 rounded-2xl p-4 hover:border-green-300 hover:shadow-lg transition-all"
