@@ -325,72 +325,91 @@ const PaymentCallback: React.FC<PaymentCallbackProps> = ({ onClose, onSuccess })
                   Tus Productos ({purchasedItems.length})
                 </h4>
 
-                {(getPurchaseByPaymentId(paymentData?.payment_id)?.items?.length ?? 0) > 0 ? (
-                  <div className="space-y-3">
-                    {getPurchaseByPaymentId(paymentData?.payment_id)?.items.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-white border-2 border-slate-200 rounded-2xl p-4 hover:border-green-300 hover:shadow-lg transition-all"
-                      >
-                        {/* Header del producto */}
-                        <div className="flex gap-4">
-                          <div className="flex-shrink-0">
-                            <img
-                              src={item.imageUrl || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=80&h=80&fit=crop'}
-                              alt={item.name}
-                              className="size-16 rounded-xl object-cover border-2 border-slate-200"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=80&h=80&fit=crop';
-                              }}
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h5 className="font-bold text-slate-800 leading-tight">{item.name}</h5>
-                            {item.description && (
-                              <p className="text-xs text-slate-500 line-clamp-2 mt-1">{item.description}</p>
-                            )}
-                            <div className="flex flex-wrap items-center gap-2 mt-2">
-                              {item.category && (
-                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">{item.category}</span>
-                              )}
-                              {item.fileType && item.fileType.length > 0 && (
-                                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">
-                                  {Array.isArray(item.fileType) ? item.fileType.join(', ') : item.fileType}
-                                </span>
-                              )}
-                              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">
-                                S/ {item.price.toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Botón de descarga */}
-                        {item.link && item.link !== '#' && item.link !== '' ? (
-                          <a
-                            href={item.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:scale-[1.02]"
+                {(() => {
+                  // Priorizar links del historial si existen y no están vacíos
+                  const purchase = getPurchaseByPaymentId(paymentData?.payment_id);
+                  const items = purchase?.items || [];
+                  const hasLinks = items.some(item => item.link && item.link !== '#' && item.link !== '');
+                  if (items.length > 0 && hasLinks) {
+                    return (
+                      <div className="space-y-3">
+                        {items.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="bg-white border-2 border-slate-200 rounded-2xl p-4 hover:border-green-300 hover:shadow-lg transition-all"
                           >
-                            <span className="material-symbols-outlined">download</span>
-                            Descargar Archivo
-                          </a>
-                        ) : (
-                          <div className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-slate-100 border-2 border-slate-200 text-slate-500 font-medium rounded-xl">
-                            <span className="material-symbols-outlined text-lg">sync</span>
-                            Procesando link de descarga...
+                            {/* Header del producto */}
+                            <div className="flex gap-4">
+                              <div className="flex-shrink-0">
+                                <img
+                                  src={item.imageUrl || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=80&h=80&fit=crop'}
+                                  alt={item.name}
+                                  className="size-16 rounded-xl object-cover border-2 border-slate-200"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=80&h=80&fit=crop';
+                                  }}
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h5 className="font-bold text-slate-800 leading-tight">{item.name}</h5>
+                                {item.description && (
+                                  <p className="text-xs text-slate-500 line-clamp-2 mt-1">{item.description}</p>
+                                )}
+                                <div className="flex flex-wrap items-center gap-2 mt-2">
+                                  {item.category && (
+                                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">{item.category}</span>
+                                  )}
+                                  {item.fileType && item.fileType.length > 0 && (
+                                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">
+                                      {Array.isArray(item.fileType) ? item.fileType.join(', ') : item.fileType}
+                                    </span>
+                                  )}
+                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">
+                                    S/ {item.price.toFixed(2)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Botón de descarga */}
+                            {item.link && item.link !== '#' && item.link !== '' ? (
+                              <a
+                                href={item.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:scale-[1.02]"
+                              >
+                                <span className="material-symbols-outlined">download</span>
+                                Descargar Archivo
+                              </a>
+                            ) : (
+                              <div className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-slate-100 border-2 border-slate-200 text-slate-500 font-medium rounded-xl">
+                                <span className="material-symbols-outlined text-lg">sync</span>
+                                Procesando link de descarga...
+                              </div>
+                            )}
                           </div>
-                        )}
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-slate-500">
-                    <span className="material-symbols-outlined text-4xl mb-2">inbox</span>
-                    <p>No se encontraron productos</p>
-                  </div>
-                )}
+                    );
+                  } else if (items.length > 0) {
+                    // Si hay productos pero sin links
+                    return (
+                      <div className="text-center py-8 text-slate-500">
+                        <span className="material-symbols-outlined text-4xl mb-2">sync</span>
+                        <p>Procesando links de descarga. Revisa tu correo o historial.</p>
+                      </div>
+                    );
+                  } else {
+                    // No hay productos
+                    return (
+                      <div className="text-center py-8 text-slate-500">
+                        <span className="material-symbols-outlined text-4xl mb-2">inbox</span>
+                        <p>No se encontraron productos</p>
+                      </div>
+                    );
+                  }
+                })()}
               </div>
             </div>
           )}
