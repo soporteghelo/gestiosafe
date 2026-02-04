@@ -753,11 +753,13 @@ const CheckoutModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
               <div className="text-right"><p className="text-[9px] font-bold text-slate-400">{cart.length} items</p></div>
             </div>
 
-            {/* Debug console - oculto en móvil */}
+            {/* Debug console oculto - dejar en código para pruebas futuras */}
+            {/*
             <div className="hidden lg:block mt-4 bg-slate-900 rounded-lg p-3 h-[120px] overflow-y-auto font-mono text-[9px] border border-slate-800">
               <p className="text-slate-500 font-bold mb-1 uppercase tracking-widest border-b border-slate-700 pb-1">Debug</p>
               {logs.length === 0 ? (<p className="text-slate-600 italic">Esperando...</p>) : (logs.slice(-5).map((log, i) => (<p key={i} className="text-green-400 mb-0.5 break-all"><span className="text-slate-500 mr-1 opacity-50">&gt;</span>{log}</p>)))}
             </div>
+            */}
           </div>
         </div>
         </div>
