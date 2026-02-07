@@ -170,3 +170,45 @@ MIT
 - Venta única: $1,500 - $2,500 USD (instalación y dominio incluidos)
 - SaaS mensual: $40 - $80 USD/mes (con soporte y actualizaciones)
 
+---
+
+## 💸 Comisiones y Descuentos de Mercado Pago
+
+Al procesar pagos con Mercado Pago Checkout Pro, la plataforma aplica una comisión por cada transacción. Según la documentación oficial de Mercado Pago Perú (2026):
+
+| Tipo de pago         | Comisión estándar*      | Plazo de acreditación |
+|--------------------- |------------------------|----------------------|
+| Tarjeta de crédito   | 3.99% + S/ 1.00 por pago| Inmediato            |
+| Tarjeta de débito    | 3.99% + S/ 1.00 por pago| Inmediato            |
+| Pago en efectivo     | 3.99% + S/ 1.00 por pago| Inmediato            |
+
+*Las comisiones pueden variar según el país, tipo de cuenta y promociones vigentes. Consulta siempre la [documentación oficial](https://www.mercadopago.com.pe/developers/es/guides/online-payments/checkout-pro/fees) para valores actualizados.
+
+**Ejemplo:**
+- Si vendes una plantilla a S/ 100.00, Mercado Pago descontará S/ 4.99 (3.99% + S/ 1.00) y recibirás S/ 95.01 en tu cuenta.
+
+**Otros posibles descuentos:**
+- Retenciones fiscales según normativa local
+- Comisiones adicionales por devolución o contracargos
+- Costos de transferencia bancaria (si retiras fondos)
+
+**Recomendación:**
+- Revisa periódicamente las comisiones y ajusta tus precios si es necesario.
+- Consulta el panel de Mercado Pago para ver el detalle de cada transacción.
+
+---
+
+## 🔐 Protección de Datos de Usuario
+
+GESTIOSAFE cumple con las mejores prácticas de privacidad y protección de datos:
+- Los datos personales ingresados en el checkout solo se usan para procesar la compra y entregar los productos.
+- No se comparten datos con terceros no autorizados.
+- El usuario puede solicitar la eliminación de sus datos escribiendo a soporte.
+- Toda la información viaja cifrada mediante HTTPS.
+
+---
+
+## 📝 Notas de Desarrollo
+
+- El cuadro de log de depuración en el checkout ha sido ocultado visualmente, pero sigue disponible en el código para futuras pruebas y soporte.
+
